@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CheckCircle2, Landmark, MapPin } from "lucide-react";
+import { CheckCircle2, Landmark, MapPin, Share2 } from "lucide-react";
 import { getComments, getMyVotes, getProposal, type Comment } from "@/lib/data";
 import { getDeviceId } from "@/lib/participant";
 import { formatDate, pct, timeAgo } from "@/lib/format";
+import { getSiteUrl } from "@/lib/site-url";
 import { GROUP_LABEL, SUPPORT_THRESHOLD } from "@/content/site";
 import { CommentForm, ReportButton, VoteButtons } from "@/components/participation";
-import { Bar, Container, IssueBadge, SimBadge, StatusBadge, cn } from "@/components/ui";
+import { Container, IssueBadge, SimBadge, StatusBadge, ThresholdMeter, cn } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -21,21 +22,22 @@ export async function generateMetadata({ params }: PageProps<"/usulan/[id]">): P
 
 const STEPS = [
   { key: "diajukan", label: "Diajukan" },
-  { key: "dipertimbangkan", label: `Dipertimbangkan (≥${SUPPORT_THRESHOLD} dukungan)` },
-  { key: "final", label: "Ditanggapi" },
+  { key: "dipertimbangkan", label: `Dapat ${SUPPORT_THRESHOLD} 👍, ditimbang pemerintah` },
+  { key: "final", label: "Dijawab pemerintah" },
 ];
 
 export default async function ProposalDetailPage({ params, searchParams }: PageProps<"/usulan/[id]">) {
   const { id } = await params;
   const sp = await searchParams;
   if (!UUID_RE.test(id)) notFound();
-  const [p, comments, deviceId] = await Promise.all([getProposal(id), getComments(id), getDeviceId()]);
+  const [p, comments, deviceId, siteUrl] = await Promise.all([getProposal(id), getComments(id), getDeviceId(), getSiteUrl()]);
   if (!p) notFound();
   const myVotes = await getMyVotes(deviceId);
 
   const stepIndex = p.status === "diajukan" ? 0 : p.status === "dipertimbangkan" ? 1 : 2;
   const totalVotes = p.support + p.oppose;
   const byStance = (s: Comment["stance"]) => comments.filter((c) => c.stance === s);
+  const shareText = `Dukung usulan warga ini di Rembug Warga: "${p.title}" ${siteUrl}/usulan/${p.id}`;
 
   return (
     <Container className="py-8">
@@ -47,12 +49,20 @@ export default async function ProposalDetailPage({ params, searchParams }: PageP
       </nav>
 
       {sp.baru === "1" && (
-        <div role="status" className="mt-4 flex items-start gap-3 rounded-lg border-l-4 border-brand-600 bg-brand-50 p-4 text-brand-900">
-          <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
-          <p>
-            <strong>Usulanmu sudah terbit!</strong> Bagikan ke teman agar mendapat dukungan. Usulan yang mencapai{" "}
-            {SUPPORT_THRESHOLD} dukungan akan dipertimbangkan dan ditanggapi.
+        <div role="status" className="mt-4 flex animate-rise flex-wrap items-center gap-4 rounded-lg border-l-4 border-brand-600 bg-brand-50 p-4 text-brand-900">
+          <CheckCircle2 className="h-10 w-10 shrink-0 animate-check text-brand-600" aria-hidden />
+          <p className="min-w-0 flex-1 text-base">
+            <strong className="block text-lg">Usulanmu sudah terbit!</strong>
+            Ajak teman mendukung. {SUPPORT_THRESHOLD} 👍 = pemerintah wajib menjawab.
           </p>
+          <a
+            href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-base font-bold text-white hover:bg-emerald-700"
+          >
+            <Share2 className="h-5 w-5" aria-hidden /> Bagikan ke WhatsApp
+          </a>
         </div>
       )}
 
@@ -92,17 +102,17 @@ export default async function ProposalDetailPage({ params, searchParams }: PageP
 
           {/* Forum diskusi */}
           <section id="diskusi" className="mt-10 scroll-mt-28">
-            <h2 className="border-b-2 border-slate-900 pb-2 text-2xl font-black text-slate-900">Rembug argumen</h2>
-            <p className="mt-1 text-slate-600">
-              Timbang alasan dari dua sisi sebelum memutuskan. {comments.length} argumen sejauh ini.
+            <h2 className="border-b-2 border-slate-900 pb-2 text-2xl font-black text-slate-900">Pendapat warga</h2>
+            <p className="mt-1 text-base text-slate-600">
+              Baca alasan dari dua sisi. {comments.length} komentar sejauh ini.
             </p>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <ArgumentColumn title="Argumen pro" items={byStance("pro")} tone="pro" />
-              <ArgumentColumn title="Argumen kontra" items={byStance("kontra")} tone="kontra" />
+              <ArgumentColumn title="👍 Setuju" items={byStance("pro")} tone="pro" />
+              <ArgumentColumn title="👎 Tidak setuju" items={byStance("kontra")} tone="kontra" />
             </div>
             {byStance("netral").length > 0 && (
               <div className="mt-4">
-                <ArgumentColumn title="Catatan netral & pertanyaan" items={byStance("netral")} tone="netral" />
+                <ArgumentColumn title="❓ Pertanyaan & catatan" items={byStance("netral")} tone="netral" />
               </div>
             )}
             <div className="mt-6">
@@ -118,20 +128,12 @@ export default async function ProposalDetailPage({ params, searchParams }: PageP
             <div className="mt-3">
               <VoteButtons proposalId={p.id} support={p.support} oppose={p.oppose} myVote={myVotes[p.id]} />
             </div>
-            <div className="mt-4 space-y-1.5 text-sm">
-              <div className="flex justify-between text-slate-600">
-                <span>Dukungan menuju ambang</span>
-                <span className="font-bold tabular-nums">
-                  {p.support}/{SUPPORT_THRESHOLD}
-                </span>
-              </div>
-              <Bar value={Math.min(p.support, SUPPORT_THRESHOLD)} max={SUPPORT_THRESHOLD} className="bg-brand-600" />
-              {totalVotes > 0 && (
-                <p className="pt-1 text-xs text-slate-500">
-                  {pct(p.support, totalVotes)}% mendukung dari {totalVotes} suara
-                </p>
-              )}
-            </div>
+            <ThresholdMeter support={p.support} status={p.status} className="mt-5" />
+            {totalVotes > 0 && (
+              <p className="mt-2 text-sm text-slate-600">
+                {pct(p.support, totalVotes)}% mendukung dari {totalVotes} suara
+              </p>
+            )}
             </div>
           </div>
 
@@ -169,13 +171,13 @@ function ArgumentColumn({ title, items, tone }: { title: string; items: Comment[
         {title} <span className="font-normal opacity-80">({items.length})</span>
       </h3>
       {items.length === 0 ? (
-        <p className="mt-2 text-sm text-slate-500">Belum ada. Tambahkan sudut pandangmu.</p>
+        <p className="mt-2 text-base text-slate-500">Belum ada. Tulis pendapatmu di bawah.</p>
       ) : (
         <ul className="mt-3 space-y-3">
           {items.map((c) => (
             <li key={c.id} className="rounded-md bg-white p-3 ring-1 ring-slate-200">
-              <p className="whitespace-pre-line text-sm text-slate-800">{c.body}</p>
-              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+              <p className="whitespace-pre-line text-base text-slate-800">{c.body}</p>
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm text-slate-500">
                 <span>
                   <strong className="text-slate-700">{c.author_name ?? "Anonim"}</strong> · {GROUP_LABEL[c.author_group] ?? c.author_group} · {timeAgo(c.created_at)}
                 </span>

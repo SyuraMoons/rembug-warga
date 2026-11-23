@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { ViewTransition, useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { addStatementAction, voteStatementAction, type ActionResult } from "@/app/actions/participation";
 import { ISSUES, type IssueSlug } from "@/content/issues";
 import { useParticipant } from "./ParticipantProvider";
@@ -11,9 +11,9 @@ import { submitWithoutReset } from "./useFormSubmit";
 type Choice = "setuju" | "tidak" | "ragu";
 
 const CHOICES: { value: Choice; label: string; on: string; off: string }[] = [
-  { value: "setuju", label: "Setuju", on: "bg-brand-700 text-white border-brand-700", off: "border-brand-200 text-brand-800 hover:bg-brand-50" },
-  { value: "tidak", label: "Tidak setuju", on: "bg-rose-600 text-white border-rose-600", off: "border-rose-200 text-rose-700 hover:bg-rose-50" },
-  { value: "ragu", label: "Ragu / Lewati", on: "bg-slate-600 text-white border-slate-600", off: "border-slate-200 text-slate-600 hover:bg-slate-50" },
+  { value: "setuju", label: "👍 Setuju", on: "bg-brand-700 text-white border-brand-700", off: "border-brand-200 text-brand-800 hover:bg-brand-50" },
+  { value: "tidak", label: "👎 Tidak setuju", on: "bg-rose-600 text-white border-rose-600", off: "border-rose-200 text-rose-700 hover:bg-rose-50" },
+  { value: "ragu", label: "🤔 Ragu", on: "bg-slate-600 text-white border-slate-600", off: "border-slate-200 text-slate-600 hover:bg-slate-50" },
 ];
 
 export type StatementView = {
@@ -45,7 +45,7 @@ export function StatementCard({ s, myVote }: { s: StatementView; myVote?: Choice
   return (
     <article className="rounded-lg border border-slate-200 border-l-4 border-l-brand-600 bg-white p-5">
       <p className="text-lg font-bold leading-snug text-slate-900">“{s.text}”</p>
-      <p className="mt-1 text-xs text-slate-500">{s.is_seed ? "Pernyataan pemantik dari tim" : "Pernyataan dari warga"}</p>
+      <p className="mt-1 text-sm text-slate-500">{s.is_seed ? "Pernyataan dari tim" : "Pernyataan dari warga"}</p>
       <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Tanggapan kamu">
         {CHOICES.map((c) => (
           <button
@@ -54,7 +54,7 @@ export function StatementCard({ s, myVote }: { s: StatementView; myVote?: Choice
             disabled={pending}
             aria-pressed={myVote === c.value}
             onClick={() => vote(c.value)}
-            className={cn("rounded-xl border px-4 py-2 text-sm font-bold transition disabled:opacity-60", myVote === c.value ? c.on : c.off)}
+            className={cn("min-h-11 rounded-xl border-2 px-4 py-2 text-base font-bold transition active:scale-95 disabled:opacity-60", myVote === c.value ? c.on : c.off)}
           >
             {c.label}
           </button>
@@ -63,18 +63,22 @@ export function StatementCard({ s, myVote }: { s: StatementView; myVote?: Choice
       {error && <p role="alert" className="mt-2 text-sm font-semibold text-rose-700">{error}</p>}
 
       {myVote ? (
-        <div className="mt-4">
-          <div className="flex h-3 gap-0.5 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${pct(s.setuju)}% setuju, ${pct(s.tidak)}% tidak setuju, ${pct(s.ragu)}% ragu`}>
-            {s.setuju > 0 && <div className="bg-brand-600" style={{ width: `${pct(s.setuju)}%` }} />}
-            {s.tidak > 0 && <div className="bg-rose-600" style={{ width: `${pct(s.tidak)}%` }} />}
-            {s.ragu > 0 && <div className="bg-slate-300" style={{ width: `${pct(s.ragu)}%` }} />}
+        // Hasil "muncul" setelah memilih: animasi naik singkat lewat React <ViewTransition>.
+        <ViewTransition enter="reveal" default="none">
+          <div className="mt-4">
+            <p className="mb-1.5 text-sm font-bold text-slate-700">Jawaban warga sejauh ini:</p>
+            <div className="flex h-3.5 gap-0.5 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`${pct(s.setuju)}% setuju, ${pct(s.tidak)}% tidak setuju, ${pct(s.ragu)}% ragu`}>
+              {s.setuju > 0 && <div className="animate-grow-x bg-brand-600 transition-[width] duration-700" style={{ width: `${pct(s.setuju)}%` }} />}
+              {s.tidak > 0 && <div className="animate-grow-x bg-rose-600 transition-[width] duration-700" style={{ width: `${pct(s.tidak)}%` }} />}
+              {s.ragu > 0 && <div className="animate-grow-x bg-slate-300 transition-[width] duration-700" style={{ width: `${pct(s.ragu)}%` }} />}
+            </div>
+            <p className="mt-1.5 text-sm text-slate-600">
+              <strong className="text-brand-800">{pct(s.setuju)}% setuju</strong> · <strong className="text-rose-700">{pct(s.tidak)}% tidak</strong> · {pct(s.ragu)}% ragu · {s.total} suara
+            </p>
           </div>
-          <p className="mt-1.5 text-xs text-slate-600">
-            <strong className="text-brand-800">{pct(s.setuju)}% setuju</strong> · <strong className="text-rose-700">{pct(s.tidak)}% tidak</strong> · {pct(s.ragu)}% ragu · {s.total} suara
-          </p>
-        </div>
+        </ViewTransition>
       ) : (
-        <p className="mt-3 text-xs text-slate-500">Hasil sementara tampil setelah kamu memilih, agar pilihanmu tidak terpengaruh suara mayoritas.</p>
+        <p className="mt-3 text-sm text-slate-600">Pilih dulu, nanti hasilnya muncul.</p>
       )}
       {!s.is_seed && (
         <div className="mt-3">
@@ -96,8 +100,8 @@ export function AddStatementForm({ defaultIssue }: { defaultIssue: IssueSlug }) 
 
   return (
     <form ref={formRef} onSubmit={submitWithoutReset(action, requireProfile)} className="space-y-3 rounded-xl border-2 border-dashed border-brand-300 bg-white p-5">
-      <h3 className="font-bold text-slate-900">Punya pandangan lain? Tambahkan pernyataan</h3>
-      <p className="text-sm text-slate-600">Tulis satu kalimat yang bisa disetujui atau ditolak orang lain. Hindari pertanyaan atau serangan pribadi.</p>
+      <h3 className="text-lg font-bold text-slate-900">Punya pendapat lain? Tulis satu kalimat</h3>
+      <p className="text-base text-slate-600">Kalimat yang bisa disetujui atau tidak oleh warga lain.</p>
       <div className="flex flex-col gap-2 sm:flex-row">
         <label className="sm:w-48">
           <span className="sr-only">Isu</span>
@@ -118,7 +122,7 @@ export function AddStatementForm({ defaultIssue }: { defaultIssue: IssueSlug }) 
         </button>
       </div>
       {state && (
-        <p role="status" className={cn("text-sm font-semibold", state.ok ? "text-brand-700" : "text-rose-700")}>
+        <p key={state.ok ? state.message : state.error} role="status" className={cn("animate-rise text-base font-semibold", state.ok ? "text-brand-700" : "text-rose-700")}>
           {state.ok ? state.message : state.error}
         </p>
       )}

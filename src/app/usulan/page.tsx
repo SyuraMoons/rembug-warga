@@ -6,8 +6,7 @@ import { getDeviceId } from "@/lib/participant";
 import { sortProposals } from "@/lib/sort";
 import { FilterBar, parseSort } from "@/components/FilterBar";
 import { ProposalCard } from "@/components/ProposalCard";
-import { ButtonLink, Container, EmptyState, ObjectiveStrip, PageHeader } from "@/components/ui";
-import { SUPPORT_THRESHOLD } from "@/content/site";
+import { ButtonLink, Container, EmptyState, PageHeader, Why } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Usulan Warga" };
 export const dynamic = "force-dynamic";
@@ -22,24 +21,19 @@ export default async function UsulanPage({ searchParams }: PageProps<"/usulan">)
   return (
     <>
       <PageHeader
-        eyebrow="Mekanisme 1 · Usulan warga"
-        title="Solusi kota dimulai dari usulan"
-        accent="warga sendiri"
-        description="Dukung usulan yang menurutmu penting, beri argumen, atau ajukan usulanmu sendiri."
+        title="Ide warga untuk"
+        accent="kota kita"
+        description="Dukung ide yang kamu setujui, atau tulis idemu sendiri."
       >
         <ButtonLink href={issue ? `/usulan/baru?isu=${issue}` : "/usulan/baru"} variant="accent" className="px-5 py-3 text-base">
-          <Plus className="h-5 w-5" aria-hidden /> Ajukan usulan baru
+          <Plus className="h-5 w-5" aria-hidden /> Tulis usulan baru
         </ButtonLink>
       </PageHeader>
       <Container className="py-8">
-        <ObjectiveStrip
-          objective="Mengubah keluhan menjadi usulan solusi yang konkret dan bisa diperjuangkan bersama."
-          how="Warga menulis usulan untuk salah satu isu; warga lain mendukung, menolak, dan memberi argumen."
-          impact={`Usulan yang mencapai ${SUPPORT_THRESHOLD} dukungan berstatus Dipertimbangkan dan wajib mendapat tanggapan resmi.`}
-        />
-        <div className="mt-10" />
+        <Why mechanism="usulan" />
+        <div className="mt-8" />
         <FilterBar basePath="/usulan" issue={issue} sort={sort} />
-        <p className="mt-4 text-sm text-slate-500">{list.length} usulan</p>
+        <p className="mt-4 text-base text-slate-600">{list.length} usulan</p>
         {list.length ? (
           <div className="mt-3 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {list.map((p) => (

@@ -12,7 +12,7 @@ import { BUDGET_LIMIT, BUDGET_PROJECT_BY_ID } from "@/content/budget";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; error: string } | null;
 
-const NEED_PROFILE = "Isi profil peserta dulu (kategori warga & persetujuan aturan) sebelum ikut berpartisipasi.";
+const NEED_PROFILE = "Isi profil singkat dulu, ya (cukup pilih kelompokmu).";
 const RATE_LIMITED = "Terlalu banyak kiriman dalam waktu singkat. Tunggu sebentar lalu coba lagi.";
 const GENERIC_ERROR = "Terjadi kesalahan saat menyimpan. Coba lagi.";
 
@@ -90,7 +90,7 @@ export async function submitProposalAction(_prev: ActionResult, formData: FormDa
 // ---------- Argumen diskusi ----------
 const commentSchema = z.object({
   proposalId: uuid,
-  stance: z.enum(["pro", "kontra", "netral"], { message: "Pilih posisi argumenmu." }),
+  stance: z.enum(["pro", "kontra", "netral"], { message: "Pilih: setuju, tidak setuju, atau mau tanya." }),
   body: z.string().trim().min(3, "Argumen terlalu pendek.").max(1000, "Argumen maksimal 1000 karakter."),
 });
 
@@ -116,7 +116,7 @@ export async function addCommentAction(_prev: ActionResult, formData: FormData):
   });
   if (error) return { ok: false, error: GENERIC_ERROR };
   refresh();
-  return { ok: true, message: "Argumen terkirim. Terima kasih sudah berdeliberasi!" };
+  return { ok: true, message: "Pendapatmu terkirim. Terima kasih!" };
 }
 
 // ---------- Voting usulan ----------
@@ -211,7 +211,7 @@ export async function submitBallotAction(projectIds: string[]): Promise<ActionRe
   if (unique.length === 0) return { ok: false, error: "Pilih minimal satu program." };
   if (unique.some((id) => !BUDGET_PROJECT_BY_ID[id])) return { ok: false, error: "Program tidak dikenal." };
   const total = unique.reduce((sum, id) => sum + BUDGET_PROJECT_BY_ID[id].cost, 0);
-  if (total > BUDGET_LIMIT) return { ok: false, error: "Total pilihanmu melebihi pagu Rp 10 miliar." };
+  if (total > BUDGET_LIMIT) return { ok: false, error: "Pilihanmu lebih dari Rp 10 miliar." };
 
   const { error } = await db()
     .from("budget_ballots")
@@ -221,7 +221,7 @@ export async function submitBallotAction(projectIds: string[]): Promise<ActionRe
     );
   if (error) return { ok: false, error: GENERIC_ERROR };
   refresh();
-  return { ok: true, message: "Surat suara anggaranmu tersimpan! Kamu masih bisa mengubahnya." };
+  return { ok: true, message: "Pilihanmu tersimpan! Kamu masih bisa mengubahnya." };
 }
 
 // ---------- Laporan konten ----------

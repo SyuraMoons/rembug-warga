@@ -114,10 +114,10 @@ export default async function HasilPage() {
         <div className="grid grid-cols-2 gap-3 py-8 md:grid-cols-3 lg:grid-cols-6">
           <Stat label="Warga unik" value={formatNumber(stats.participants)} hint="per perangkat" />
           <Stat label="Usulan" value={formatNumber(stats.proposals)} />
-          <Stat label="Argumen" value={formatNumber(stats.comments)} />
-          <Stat label="Suara usulan" value={formatNumber(stats.votes)} />
-          <Stat label="Suara konsensus" value={formatNumber(stats.consensusVotes)} />
-          <Stat label="Surat suara anggaran" value={formatNumber(stats.ballots)} />
+          <Stat label="Komentar" value={formatNumber(stats.comments)} />
+          <Stat label="Suara 👍 👎" value={formatNumber(stats.votes)} />
+          <Stat label="Jawaban setuju/tidak" value={formatNumber(stats.consensusVotes)} />
+          <Stat label="Pilihan anggaran" value={formatNumber(stats.ballots)} />
         </div>
 
         {/* Temuan utama */}

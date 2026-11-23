@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { BookOpen, Bus, ChevronRight, Recycle, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookOpen, Bus, ChevronDown, ChevronRight, HelpCircle, Recycle, type LucideIcon } from "lucide-react";
 import { ISSUE_BY_SLUG, type IssueSlug } from "@/content/issues";
-import { PROPOSAL_STATUS, type ProposalStatus } from "@/content/site";
+import { MECHANISM_BY_KEY, type MechanismKey } from "@/content/mechanisms";
+import { PROPOSAL_STATUS, SUPPORT_THRESHOLD, type ProposalStatus } from "@/content/site";
 
 /*
  * Kit UI bergaya deck konsultan (lihat reference/ halaman 16, "style guide"):
@@ -172,28 +173,6 @@ export function Chevron({ className }: { className?: string }) {
   return <ChevronRight className={cn("h-6 w-6 shrink-0 text-brand-500", className)} aria-hidden />;
 }
 
-/**
- * Pita "Tujuan · Cara kerja · Dampak", setara kolom Objective / Description / Impact
- * pada slide strategi referensi. Dipakai di setiap halaman mekanisme partisipasi.
- */
-export function ObjectiveStrip({ objective, how, impact }: { objective: ReactNode; how: ReactNode; impact: ReactNode }) {
-  const cols = [
-    { label: "Tujuan", body: objective },
-    { label: "Cara kerja", body: how },
-    { label: "Dampak", body: impact },
-  ];
-  return (
-    <div className="grid gap-4 md:grid-cols-3">
-      {cols.map((c) => (
-        <div key={c.label} className="flex flex-col">
-          <LabelBar as="h2">{c.label}</LabelBar>
-          <div className="mt-2 flex-1 rounded-lg border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-700">{c.body}</div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export function Card({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cn("rounded-lg border border-slate-200 bg-white p-5", className)}>{children}</div>;
 }
@@ -255,7 +234,149 @@ export function Bar({ value, max, className = "bg-brand-600", label }: { value: 
   const width = max === 0 ? 0 : Math.max(value > 0 ? 2 : 0, Math.round((value / max) * 100));
   return (
     <div className="h-2.5 w-full overflow-hidden rounded-sm bg-slate-100" role="img" aria-label={label ?? `${value} dari ${max}`}>
-      <div className={cn("h-full rounded-sm", className)} style={{ width: `${width}%` }} />
+      <div className={cn("h-full animate-grow-x rounded-sm transition-[width] duration-700", className)} style={{ width: `${width}%` }} />
+    </div>
+  );
+}
+
+/* ---------- Komponen ramah warga (bahasa sederhana, ikon besar, umpan balik visual) ---------- */
+
+/** Tombol aksi besar: ikon + judul ≤4 kata + satu baris penjelasan. */
+export function ActionTile({
+  href,
+  icon: Icon,
+  title,
+  text,
+  primary = false,
+}: {
+  href: string;
+  icon: LucideIcon;
+  title: string;
+  text: string;
+  primary?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "group flex min-h-24 items-center gap-4 rounded-xl border-2 p-5 transition hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98]",
+        primary
+          ? "border-brand-600 bg-brand-600 text-white shadow-brand-600/20 hover:bg-brand-700"
+          : "border-slate-200 bg-white text-slate-900 shadow-brand-600/10 hover:border-brand-400",
+      )}
+    >
+      <span
+        className={cn(
+          "flex h-14 w-14 shrink-0 items-center justify-center rounded-full",
+          primary ? "bg-white/15 text-white" : "bg-brand-50 text-brand-600",
+        )}
+      >
+        <Icon className="h-7 w-7" aria-hidden />
+      </span>
+      <span className="min-w-0">
+        <span className="block text-xl font-black leading-tight">{title}</span>
+        <span className={cn("mt-1 block text-base", primary ? "text-brand-50" : "text-slate-600")}>{text}</span>
+      </span>
+      <ArrowRight className="ml-auto h-6 w-6 shrink-0 transition group-hover:translate-x-1" aria-hidden />
+    </Link>
+  );
+}
+
+/**
+ * Penjelasan mekanisme yang dilipat: warga langsung melihat tombol aksi, sementara
+ * Tujuan / Cara kerja / Dampak tetap tersedia bagi yang ingin tahu (dan bagi juri).
+ */
+export function Why({ mechanism, className }: { mechanism: MechanismKey; className?: string }) {
+  const m = MECHANISM_BY_KEY[mechanism];
+  const rows = [
+    { label: "Tujuan", body: m.objective },
+    { label: "Cara kerja", body: m.how },
+    { label: "Dampaknya", body: m.impact },
+  ];
+  return (
+    <details className={cn("group rounded-lg border border-slate-200 bg-white", className)}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-4 py-3 font-bold text-brand-800 hover:bg-brand-50 [&::-webkit-details-marker]:hidden">
+        <HelpCircle className="h-5 w-5 shrink-0" aria-hidden />
+        Kenapa ini penting?
+        <ChevronDown className="ml-auto h-5 w-5 shrink-0 transition group-open:rotate-180" aria-hidden />
+      </summary>
+      <dl className="grid animate-rise gap-4 border-t border-slate-200 px-4 py-4 md:grid-cols-3">
+        {rows.map((r) => (
+          <div key={r.label}>
+            <dt className="text-sm font-black uppercase tracking-wide text-brand-700">{r.label}</dt>
+            <dd className="mt-1 text-base leading-relaxed text-slate-700">{r.body}</dd>
+          </div>
+        ))}
+      </dl>
+    </details>
+  );
+}
+
+/**
+ * Meteran menuju ambang dukungan. Menggantikan penjelasan "ambang" dengan gambar:
+ * bar terisi sampai 15 👍, lalu berubah hijau ketika usulan wajib dijawab.
+ */
+export function ThresholdMeter({ support, status, className }: { support: number; status: ProposalStatus; className?: string }) {
+  const answered = status === "ditindaklanjuti" || status === "ditolak";
+  const reached = status !== "diajukan" || support >= SUPPORT_THRESHOLD;
+  const shown = Math.min(support, SUPPORT_THRESHOLD);
+  const pct = reached ? 100 : Math.round((shown / SUPPORT_THRESHOLD) * 100);
+  const left = SUPPORT_THRESHOLD - shown;
+
+  const note = answered
+    ? "Sudah dijawab pemerintah ✓"
+    : reached
+      ? "Wajib dijawab ✓ Sedang ditimbang"
+      : `Butuh ${left} 👍 lagi supaya wajib dijawab`;
+
+  return (
+    <div className={className}>
+      <div className="flex items-baseline justify-between gap-3 text-sm">
+        <span className={cn("font-bold", reached ? "text-emerald-700" : "text-slate-700")}>{note}</span>
+        {!answered && (
+          <span className="shrink-0 font-black tabular-nums text-slate-900">
+            {shown}/{SUPPORT_THRESHOLD} 👍
+          </span>
+        )}
+      </div>
+      <div
+        className="mt-1.5 h-3 overflow-hidden rounded-full bg-slate-100"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={SUPPORT_THRESHOLD}
+        aria-valuenow={shown}
+        aria-label={`${shown} dari ${SUPPORT_THRESHOLD} dukungan`}
+      >
+        <div
+          className={cn(
+            "h-full animate-grow-x rounded-full transition-[width,background-color] duration-700",
+            answered && status === "ditolak" ? "bg-slate-400" : reached ? "bg-emerald-500" : "bg-brand-600",
+          )}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/** Penanda langkah untuk alur terpandu: titik-titik + "Langkah 2 dari 4". */
+export function StepDots({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex items-center gap-3">
+      <ol className="flex items-center gap-1.5" aria-hidden>
+        {Array.from({ length: total }, (_, i) => (
+          <li
+            key={i}
+            className={cn(
+              "h-2.5 rounded-full transition-all duration-500",
+              i + 1 === current ? "w-8 bg-brand-600" : i + 1 < current ? "w-2.5 bg-brand-600" : "w-2.5 bg-slate-200",
+            )}
+          />
+        ))}
+      </ol>
+      <span className="text-sm font-bold text-slate-600">
+        Langkah {current} dari {total}
+      </span>
     </div>
   );
 }
