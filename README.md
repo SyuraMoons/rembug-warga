@@ -33,6 +33,14 @@ Warga sering hanya bisa **mengeluh** soal masalah kota, tanpa jalur yang jelas u
 
 Tidak perlu daftar akun. Cukup pilih kategori warga (pelajar, pekerja, lansia, disabilitas, dll.) agar hasilnya bisa dianalisis per kelompok.
 
+**Coba Sekarang (`/coba`)**: alur terpandu 4 langkah untuk warga yang belum terbiasa teknologi dan pengunjung booth (kode QR di beranda mengarah ke sini): pilih isu → dukung satu usulan → jawab satu pernyataan "setuju atau tidak?" → selesai. Satu layar satu tugas, tombol besar, sekitar 1 menit.
+
+## Ramah untuk semua warga
+
+- **Bahasa sederhana di halaman warga.** Kerangka akademik (ringkasan eksekutif, defisit demokrasi, Tujuan/Cara kerja/Dampak tiap mekanisme, SWOT) dikumpulkan di `/tentang`. Di halaman aksi, penjelasan itu dilipat di balik tombol "Kenapa ini penting?". Teksnya diambil dari satu sumber: `src/content/mechanisms.ts`.
+- **Gambar, bukan paragraf.** Meteran "x/15 👍" menggantikan penjelasan ambang dukungan; ikon dan tombol besar (≥44px) di setiap aksi.
+- **Animasi umpan balik yang halus**: angka "pop" saat memberi suara, bar yang terisi, hasil konsensus yang muncul setelah memilih, dan geser antar-langkah di `/coba` (React `<ViewTransition>`). Semua animasi mati jika perangkat meminta *reduced motion*.
+
 ## Lima cara warga berpartisipasi
 
 | Mekanisme | Apa yang dilakukan warga | Halaman |
@@ -50,6 +58,7 @@ Semua hasil tampil **langsung (real-time)** di halaman **Hasil & Transparansi** 
 | Halaman | Alamat |
 |---|---|
 | Beranda | `/` |
+| Coba Sekarang (alur terpandu) | `/coba` |
 | Tentang platform | `/tentang` |
 | Isu publik | `/isu`, `/isu/sampah`, `/isu/transportasi`, `/isu/perpustakaan` |
 | Usulan warga | `/usulan`, `/usulan/baru`, `/usulan/[id]` |

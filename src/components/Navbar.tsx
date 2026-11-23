@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, UserRound, X } from "lucide-react";
+import { Menu, Sparkles, UserRound, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { A11yControls } from "./A11yControls";
 import { useParticipant } from "./ParticipantProvider";
@@ -51,6 +51,16 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2">
+          {pathname !== "/coba" && (
+            <Link
+              href="/coba"
+              onClick={() => setOpen(false)}
+              className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-brand-600 px-4 py-1.5 text-sm font-bold text-white shadow-sm shadow-brand-600/30 transition hover:bg-brand-700 active:scale-95"
+            >
+              <Sparkles className="h-4 w-4" aria-hidden />
+              Coba<span className="hidden sm:inline"> Sekarang</span>
+            </Link>
+          )}
           <button
             type="button"
             onClick={openProfile}
