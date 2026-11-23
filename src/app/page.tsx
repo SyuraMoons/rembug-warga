@@ -25,7 +25,7 @@ const FLOW: { icon: LucideIcon; step: string; text: string }[] = [
   { icon: Send, step: "Usulkan", text: "Warga menulis ide." },
   { icon: MessagesSquare, step: "Rembugkan", text: "Warga lain memberi pendapat." },
   { icon: Vote, step: "Putuskan", text: "Warga memberi suara." },
-  { icon: Eye, step: "Pantau", text: `${SUPPORT_THRESHOLD} 👍 = pemerintah wajib menjawab.` },
+  { icon: Eye, step: "Pantau", text: `${SUPPORT_THRESHOLD} dukungan = pemerintah wajib menjawab.` },
 ];
 
 export default async function HomePage() {

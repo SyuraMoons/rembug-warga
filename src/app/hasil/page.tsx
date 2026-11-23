@@ -115,7 +115,7 @@ export default async function HasilPage() {
           <Stat label="Warga unik" value={formatNumber(stats.participants)} hint="per perangkat" />
           <Stat label="Usulan" value={formatNumber(stats.proposals)} />
           <Stat label="Komentar" value={formatNumber(stats.comments)} />
-          <Stat label="Suara 👍 👎" value={formatNumber(stats.votes)} />
+          <Stat label="Suara dukung/tolak" value={formatNumber(stats.votes)} />
           <Stat label="Jawaban setuju/tidak" value={formatNumber(stats.consensusVotes)} />
           <Stat label="Pilihan anggaran" value={formatNumber(stats.ballots)} />
         </div>

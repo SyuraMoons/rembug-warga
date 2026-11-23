@@ -107,7 +107,7 @@ export function ProposalForm({ defaultIssue }: { defaultIssue?: IssueSlug }) {
       </label>
 
       <p className="rounded-lg bg-brand-50 p-4 text-base text-slate-700">
-        Usulanmu langsung tampil untuk semua warga. {SUPPORT_THRESHOLD} 👍 = pemerintah wajib menjawab.{" "}
+        Usulanmu langsung tampil untuk semua warga. {SUPPORT_THRESHOLD} dukungan = pemerintah wajib menjawab.{" "}
         {participant ? (
           <>
             Kamu tampil sebagai <strong>{participant.name ?? "Anonim"}</strong>.

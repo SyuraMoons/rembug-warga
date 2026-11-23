@@ -11,9 +11,9 @@ import { submitWithoutReset } from "./useFormSubmit";
 type Choice = "setuju" | "tidak" | "ragu";
 
 const CHOICES: { value: Choice; label: string; on: string; off: string }[] = [
-  { value: "setuju", label: "👍 Setuju", on: "bg-brand-700 text-white border-brand-700", off: "border-brand-200 text-brand-800 hover:bg-brand-50" },
-  { value: "tidak", label: "👎 Tidak setuju", on: "bg-rose-600 text-white border-rose-600", off: "border-rose-200 text-rose-700 hover:bg-rose-50" },
-  { value: "ragu", label: "🤔 Ragu", on: "bg-slate-600 text-white border-slate-600", off: "border-slate-200 text-slate-600 hover:bg-slate-50" },
+  { value: "setuju", label: "Setuju", on: "bg-brand-700 text-white border-brand-700", off: "border-brand-200 text-brand-800 hover:bg-brand-50" },
+  { value: "tidak", label: "Tidak setuju", on: "bg-rose-600 text-white border-rose-600", off: "border-rose-200 text-rose-700 hover:bg-rose-50" },
+  { value: "ragu", label: "Ragu", on: "bg-slate-600 text-white border-slate-600", off: "border-slate-200 text-slate-600 hover:bg-slate-50" },
 ];
 
 export type StatementView = {

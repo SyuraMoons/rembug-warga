@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 
 const RULES = [
   { icon: Smartphone, text: "1 HP = 1 suara per usulan. Bisa diubah." },
-  { icon: ThumbsUp, text: `${SUPPORT_THRESHOLD} 👍 = pemerintah wajib menjawab.` },
+  { icon: ThumbsUp, text: `${SUPPORT_THRESHOLD} dukungan = pemerintah wajib menjawab.` },
   { icon: Eye, text: "Semua hasil terbuka untuk umum." },
 ];
 
@@ -32,7 +32,7 @@ export default async function VotingPage({ searchParams }: PageProps<"/voting">)
       <PageHeader
         title="Dukung usulan yang"
         accent="kamu setujui"
-        description="Tekan 👍 Dukung atau 👎 Tolak. Suaramu langsung dihitung."
+        description="Tekan Dukung atau Tolak. Suaramu langsung dihitung."
       />
       <Container>
         <div className="grid gap-4 pt-8 md:grid-cols-[1.1fr_1fr]">

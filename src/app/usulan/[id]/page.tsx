@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: PageProps<"/usulan/[id]">): P
 
 const STEPS = [
   { key: "diajukan", label: "Diajukan" },
-  { key: "dipertimbangkan", label: `Dapat ${SUPPORT_THRESHOLD} 👍, ditimbang pemerintah` },
+  { key: "dipertimbangkan", label: `Dapat ${SUPPORT_THRESHOLD} dukungan, ditimbang pemerintah` },
   { key: "final", label: "Dijawab pemerintah" },
 ];
 
@@ -53,7 +53,7 @@ export default async function ProposalDetailPage({ params, searchParams }: PageP
           <CheckCircle2 className="h-10 w-10 shrink-0 animate-check text-brand-600" aria-hidden />
           <p className="min-w-0 flex-1 text-base">
             <strong className="block text-lg">Usulanmu sudah terbit!</strong>
-            Ajak teman mendukung. {SUPPORT_THRESHOLD} 👍 = pemerintah wajib menjawab.
+            Ajak teman mendukung. {SUPPORT_THRESHOLD} dukungan = pemerintah wajib menjawab.
           </p>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
@@ -107,12 +107,12 @@ export default async function ProposalDetailPage({ params, searchParams }: PageP
               Baca alasan dari dua sisi. {comments.length} komentar sejauh ini.
             </p>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              <ArgumentColumn title="👍 Setuju" items={byStance("pro")} tone="pro" />
-              <ArgumentColumn title="👎 Tidak setuju" items={byStance("kontra")} tone="kontra" />
+              <ArgumentColumn title="Setuju" items={byStance("pro")} tone="pro" />
+              <ArgumentColumn title="Tidak setuju" items={byStance("kontra")} tone="kontra" />
             </div>
             {byStance("netral").length > 0 && (
               <div className="mt-4">
-                <ArgumentColumn title="❓ Pertanyaan & catatan" items={byStance("netral")} tone="netral" />
+                <ArgumentColumn title="Pertanyaan & catatan" items={byStance("netral")} tone="netral" />
               </div>
             )}
             <div className="mt-6">

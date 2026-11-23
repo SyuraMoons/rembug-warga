@@ -43,7 +43,7 @@ export function VoteButtons({
         setError(res.error);
         setFeedback(null);
       } else {
-        setFeedback(withdrawing ? "Suaramu dibatalkan." : value === 1 ? "Terima kasih! Dukunganmu tercatat 👍" : "Suaramu tercatat.");
+        setFeedback(withdrawing ? "Suaramu dibatalkan." : value === 1 ? "Terima kasih! Dukunganmu tercatat." : "Suaramu tercatat.");
       }
     });
   }
@@ -122,9 +122,9 @@ export function ReportButton({ type, id }: { type: "proposal" | "comment" | "sta
 // ---------- Form argumen pro/kontra ----------
 // Nilai di database tetap pro/kontra/netral; warga hanya melihat label sederhana.
 const STANCES = [
-  { value: "pro", label: "👍 Setuju", className: "has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50" },
-  { value: "kontra", label: "👎 Tidak setuju", className: "has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50" },
-  { value: "netral", label: "❓ Mau tanya", className: "has-[:checked]:border-slate-500 has-[:checked]:bg-slate-50" },
+  { value: "pro", label: "Setuju", className: "has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50" },
+  { value: "kontra", label: "Tidak setuju", className: "has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50" },
+  { value: "netral", label: "Mau tanya", className: "has-[:checked]:border-slate-500 has-[:checked]:bg-slate-50" },
 ];
 
 export function CommentForm({ proposalId }: { proposalId: string }) {

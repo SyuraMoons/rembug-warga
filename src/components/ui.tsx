@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ArrowRight, BookOpen, Bus, ChevronDown, ChevronRight, HelpCircle, Recycle, type LucideIcon } from "lucide-react";
+import { ArrowRight, BookOpen, Bus, ChevronDown, ChevronRight, HelpCircle, Recycle, ThumbsUp, type LucideIcon } from "lucide-react";
 import { ISSUE_BY_SLUG, type IssueSlug } from "@/content/issues";
 import { MECHANISM_BY_KEY, type MechanismKey } from "@/content/mechanisms";
 import { PROPOSAL_STATUS, SUPPORT_THRESHOLD, type ProposalStatus } from "@/content/site";
@@ -314,7 +314,7 @@ export function Why({ mechanism, className }: { mechanism: MechanismKey; classNa
 
 /**
  * Meteran menuju ambang dukungan. Menggantikan penjelasan "ambang" dengan gambar:
- * bar terisi sampai 15 👍, lalu berubah hijau ketika usulan wajib dijawab.
+ * bar terisi sampai 15 dukungan, lalu berubah hijau ketika usulan wajib dijawab.
  */
 export function ThresholdMeter({ support, status, className }: { support: number; status: ProposalStatus; className?: string }) {
   const answered = status === "ditindaklanjuti" || status === "ditolak";
@@ -327,15 +327,15 @@ export function ThresholdMeter({ support, status, className }: { support: number
     ? "Sudah dijawab pemerintah ✓"
     : reached
       ? "Wajib dijawab ✓ Sedang ditimbang"
-      : `Butuh ${left} 👍 lagi supaya wajib dijawab`;
+      : `Butuh ${left} dukungan lagi supaya wajib dijawab`;
 
   return (
     <div className={className}>
       <div className="flex items-baseline justify-between gap-3 text-sm">
         <span className={cn("font-bold", reached ? "text-emerald-700" : "text-slate-700")}>{note}</span>
         {!answered && (
-          <span className="shrink-0 font-black tabular-nums text-slate-900">
-            {shown}/{SUPPORT_THRESHOLD} 👍
+          <span className="inline-flex shrink-0 items-center gap-1 font-black tabular-nums text-slate-900">
+            {shown}/{SUPPORT_THRESHOLD} <ThumbsUp className="h-4 w-4 text-brand-600" aria-hidden />
           </span>
         )}
       </div>

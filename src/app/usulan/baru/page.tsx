@@ -23,7 +23,7 @@ export default async function UsulanBaruPage({ searchParams }: PageProps<"/usula
       <PageHeader
         title="Punya ide untuk kotamu?"
         accent="Tulis di sini."
-        description={`Warga lain bisa mendukung idemu. ${SUPPORT_THRESHOLD} 👍 = pemerintah wajib menjawab.`}
+        description={`Warga lain bisa mendukung idemu. ${SUPPORT_THRESHOLD} dukungan = pemerintah wajib menjawab.`}
       />
       <Container className="grid gap-8 py-10 lg:grid-cols-[1fr_300px]">
         <ProposalForm defaultIssue={issue} />
@@ -41,8 +41,8 @@ export default async function UsulanBaruPage({ searchParams }: PageProps<"/usula
             <ol className="mt-3 space-y-3">
               {[
                 "Usulanmu langsung tampil untuk semua warga.",
-                "Warga lain memberi 👍 atau 👎 dan pendapat.",
-                `Kalau sudah ${SUPPORT_THRESHOLD} 👍, pemerintah wajib menimbangnya.`,
+                "Warga lain mendukung, menolak, dan memberi pendapat.",
+                `Kalau sudah ${SUPPORT_THRESHOLD} dukungan, pemerintah wajib menimbangnya.`,
                 "Jawaban resmi (simulasi) tampil di halaman Hasil.",
               ].map((t, i) => (
                 <li key={t} className="flex items-start gap-3">

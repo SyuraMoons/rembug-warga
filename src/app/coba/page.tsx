@@ -77,7 +77,7 @@ async function renderStep(step: number, issue: IssueSlug, statementParam?: strin
     const voted = top.some((p) => myVotes[p.id]);
     return (
       <>
-        <StepTitle issue={issue} title="Dukung satu usulan yang kamu setujui" hint="Tekan 👍 Dukung atau 👎 Tolak." />
+        <StepTitle issue={issue} title="Dukung satu usulan yang kamu setujui" hint="Tekan Dukung atau Tolak." />
         {top.length ? (
           <ul className="mt-6 space-y-4">
             {top.map((p) => (
@@ -122,7 +122,7 @@ async function renderStep(step: number, issue: IssueSlug, statementParam?: strin
 
   // Langkah 4: ringkasan + langkah berikutnya
   const answer = statement ? myStatementVotes[statement.id] : undefined;
-  const answerLabel = { setuju: "Setuju 👍", tidak: "Tidak setuju 👎", ragu: "Ragu 🤔" };
+  const answerLabel = { setuju: "Setuju", tidak: "Tidak setuju", ragu: "Ragu" };
   const didSomething = Boolean(supported || answer);
 
   return (
