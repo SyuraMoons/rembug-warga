@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/*
+ * Sistem desain Rembug Warga
+ * Mengikuti gaya deck konsultan (lihat reference/): latar putih, satu warna aksen
+ * (biru), judul tegas berbentuk "action title", label-bar solid, kotak bergaris putus,
+ * dan kotak "Poin Kunci" di akhir setiap bagian.
+ */
+@theme inline {
+  --font-sans: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  /* Biru kewargaan: aksen tunggal, setara hijau #55b441 pada referensi */
+  --color-brand-50: #eff5ff;
+  --color-brand-100: #dbe8fe;
+  --color-brand-200: #bfd5fe;
+  --color-brand-300: #93b8fd;
+  --color-brand-400: #6093fa;
+  --color-brand-500: #3b6ff6;
+  --color-brand-600: #2554eb;
+  --color-brand-700: #1d42d8;
+  --color-brand-800: #1e37af;
+  --color-brand-900: #1e338a;
+  --color-brand-950: #172154;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #ffffff;
+  color: #0f172a;
+}
+
+/* ---------- Aksesibilitas: ukuran teks (diatur tombol A− / A+) ---------- */
+html[data-fs="lg"] {
+  font-size: 112.5%;
+}
+html[data-fs="xl"] {
+  font-size: 125%;
+}
+
+/* ---------- Aksesibilitas: mode kontras tinggi ---------- */
+html[data-contrast="high"] {
+  --color-slate-400: #334155;
+  --color-slate-500: #1e293b;
+  --color-slate-600: #0f172a;
+  --color-slate-700: #020617;
+  --color-brand-50: #ffffff;
+  --color-brand-600: #1e338a;
+  --color-brand-700: #172154;
+}
+html[data-contrast="high"] a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+html[data-contrast="high"] :is(.border, .border-2) {
+  border-color: #0f172a;
+}
+
+/* Fokus keyboard yang jelas */
+:focus-visible {
+  outline: 3px solid #2554eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+dialog::backdrop {
+  background: rgb(15 23 42 / 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
