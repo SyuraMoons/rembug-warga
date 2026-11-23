@@ -30,12 +30,6 @@ export function Footer() {
             <strong className="text-slate-900">Simulasi akademik</strong> · {SITE.course}.
           </p>
           <p>Bukan kanal resmi Pemerintah Kota Surabaya. Semua data adalah data simulasi.</p>
-          <p>
-            Dibuat dengan bantuan AI.{" "}
-            <Link href="/panduan#ai" className="font-semibold text-brand-700 underline">
-              Pengungkapan penggunaan AI
-            </Link>
-          </p>
         </div>
       </div>
       {/* Baris tanda tangan seperti kaki slide referensi: "NAMA AKSEN | …" */}

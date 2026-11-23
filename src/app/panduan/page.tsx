@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Accessibility, Bot, Database, Gavel, Mail, ShieldAlert, ShieldCheck, Users } from "lucide-react";
+import { Accessibility, Database, Gavel, Mail, ShieldAlert, ShieldCheck, Users } from "lucide-react";
 import { SITE, SUPPORT_THRESHOLD } from "@/content/site";
 import { CONSENSUS_MIN_VOTES } from "@/lib/data";
 import { Card, Container, Hl, LabelBar, NumberCircle, PageHeader, Section, cn } from "@/components/ui";
@@ -206,20 +206,6 @@ export default function PanduanPage() {
           </div>
         </Section>
 
-        <Section id="ai" title="Pengungkapan penggunaan AI" className="scroll-mt-28">
-          <Card>
-            <p className="flex gap-2 text-slate-700">
-              <Bot className="mt-0.5 h-5 w-5 shrink-0 text-brand-700" aria-hidden />
-              <span>
-                Sesuai ketentuan project, kami mengungkapkan bahwa asisten AI (Claude) dipakai untuk membantu menulis kode
-                website dan menyusun draf awal teks konten. Seluruh isi telah ditinjau, disunting, dan menjadi tanggung
-                jawab tim. Tidak ada AI atau bot yang dipakai untuk memberi suara, menulis usulan atas nama warga, atau
-                memoderasi konten secara otomatis selain penyaring kata kasar sederhana.
-              </span>
-            </p>
-          </Card>
-        </Section>
-
         <Section
           id="kontak"
           title="Kontak & tim"
@@ -262,6 +248,9 @@ export default function PanduanPage() {
                   Temui kami di booth pameran: <strong>Jumat, 27 November 2026</strong>, Taman FISIP Universitas Airlangga.
                 </p>
                 <p className="pt-2 text-xs text-slate-500">{SITE.course}. {SITE.disclaimer}</p>
+                <p className="text-xs text-slate-500">
+                  Alat bantu AI dipakai dalam pengembangan website ini; seluruh isi ditinjau dan menjadi tanggung jawab tim.
+                </p>
               </div>
             </Card>
           </div>
