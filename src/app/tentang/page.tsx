@@ -1,9 +1,88 @@
 import type { Metadata } from "next";
-import { Accessibility, Eye, Handshake, Landmark, MessagesSquare, Scale, ShieldCheck, Users, Wallet } from "lucide-react";
-import { Callout, Container, Hl, IconRow, KeyTakeaway, LabelBar, PageHeader, Section, SidePanel } from "@/components/ui";
-import { SITE } from "@/content/site";
+import Link from "next/link";
+import {
+  Accessibility,
+  ArrowRight,
+  ChevronDown,
+  Coins,
+  Eye,
+  EyeOff,
+  Handshake,
+  HelpCircle,
+  Landmark,
+  MessagesSquare,
+  Scale,
+  Send,
+  ShieldCheck,
+  UserX,
+  Users,
+  Vote,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  ButtonLink,
+  Callout,
+  Chevron,
+  Container,
+  Hl,
+  IconRow,
+  KeyTakeaway,
+  LabelBar,
+  PageHeader,
+  Section,
+  SidePanel,
+  Subheading,
+  TintBox,
+  cn,
+} from "@/components/ui";
+import { MECHANISMS, type MechanismKey } from "@/content/mechanisms";
+import { SITE, SUPPORT_THRESHOLD } from "@/content/site";
 
 export const metadata: Metadata = { title: "Tentang Platform" };
+
+/* ---------- Ringkasan eksekutif: Masalah → Peluang → Pertanyaan kunci → Strategi → Dampak ---------- */
+
+const PROBLEMS: { icon: LucideIcon; title: string; text: string }[] = [
+  {
+    icon: UserX,
+    title: "Defisit partisipasi",
+    text: "Musrenbang didominasi tokoh dan pengurus. Bagaimana pelajar, lansia, dan penyandang disabilitas bisa ikut bersuara?",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Defisit deliberasi",
+    text: "Kanal aspirasi bersifat satu arah: warga mengeluh tanpa menimbang argumen. Bagaimana keputusan diambil lewat pertukaran alasan?",
+  },
+  {
+    icon: EyeOff,
+    title: "Defisit transparansi",
+    text: "Warga tidak tahu apakah aspirasinya dibaca dan ditindaklanjuti. Bagaimana setiap masukan bisa dilacak sampai ada keputusan?",
+  },
+];
+
+const MECHANISM_ICONS: Record<MechanismKey, LucideIcon> = {
+  usulan: Send,
+  diskusi: MessagesSquare,
+  voting: Vote,
+  anggaran: Coins,
+  konsensus: Scale,
+};
+
+const STRATEGY_IMPACT = [
+  {
+    strategy: "Usulan + voting dengan ambang dukungan yang jelas.",
+    impact: `Usulan dengan ${SUPPORT_THRESHOLD} dukungan wajib ditanggapi, sehingga suara warga berujung pada keputusan.`,
+  },
+  {
+    strategy: "Forum pro–kontra dan Rembug Konsensus ala vTaiwan.",
+    impact: "Keputusan berbasis alasan, dengan peta titik temu dan titik beda antarkelompok warga.",
+  },
+  {
+    strategy: "Anggaran partisipatif dan halaman hasil yang terbuka real-time.",
+    impact: "Prioritas anggaran ditentukan warga dan setiap suara serta tindakan moderasi bisa diperiksa publik.",
+  },
+];
 
 /* ---------- Gambaran umum (setara slide "Company Overview") ---------- */
 
@@ -31,6 +110,7 @@ const USERS = [
 
 const STRENGTHS = [
   "Tanpa login: ikut berpartisipasi dalam hitungan detik",
+  "Alur terpandu 1 menit dan bahasa sederhana bagi warga yang belum terbiasa teknologi",
   "Lima mekanisme partisipasi yang saling terhubung",
   "Hasil & log moderasi terbuka real-time",
   "Aturan keputusan yang jelas (ambang dukungan & tanggapan wajib)",
@@ -68,7 +148,7 @@ const CONCEPTS = [
   { term: "E-participation", text: "Partisipasi warga lewat kanal daring: mengusulkan, berdiskusi, dan memberi suara." },
   { term: "Demokrasi deliberatif", text: "Kualitas keputusan bergantung pada pertukaran alasan yang setara, bukan hanya jumlah suara. Diwujudkan lewat forum pro–kontra dan Rembug Konsensus." },
   { term: "Demokrasi partisipatoris", text: "Warga terlibat langsung dalam keputusan, misalnya lewat anggaran partisipatif dan usulan warga." },
-  { term: "Kesenjangan digital", text: "Tidak semua warga punya gawai, kuota, atau literasi digital. Karena itu kami memakai bahasa sederhana, teks besar & kontras tinggi, tampilan ramah HP, serta pendampingan di booth." },
+  { term: "Kesenjangan digital", text: "Tidak semua warga punya gawai, kuota, atau literasi digital. Karena itu halaman warga memakai bahasa sederhana dan ikon besar, alur terpandu 3 langkah (Coba Sekarang), umpan balik visual alih-alih penjelasan panjang, teks besar & kontras tinggi, tampilan ramah HP, serta pendampingan di booth. Penjelasan akademik dipisahkan ke halaman ini agar tidak membebani warga." },
 ];
 
 const INSPIRATIONS = [
@@ -90,8 +170,112 @@ export default function TentangPage() {
             Platform ini membawanya ke ruang digital agar lebih banyak warga {SITE.city} bisa ikut menentukan arah kotanya.
           </>
         }
-      />
+      >
+        <p className="text-base text-slate-600">
+          Halaman ini berisi kerangka lengkap untuk juri & dosen.{" "}
+          <Link href="/coba" className="font-bold text-brand-700 hover:underline">
+            Mau langsung ikut? Coba Sekarang →
+          </Link>
+        </p>
+      </PageHeader>
       <Container>
+        {/* Ringkasan eksekutif (dipindah dari beranda agar beranda fokus pada aksi warga) */}
+        <Section
+          id="ringkasan"
+          title="Ringkasan eksekutif"
+          takeaway={
+            <>
+              Rembug Warga menjawab <Hl>tiga defisit demokrasi kota</Hl>: partisipasi, deliberasi, dan transparansi. Caranya
+              dengan <Hl>lima mekanisme</Hl> yang saling terhubung, dari usulan hingga <Hl>tanggapan resmi yang wajib</Hl>,
+              sehingga suara warga tidak berhenti sebagai keluhan.
+            </>
+          }
+        >
+          <div className="grid gap-10 lg:grid-cols-[1.15fr_auto_1fr]">
+            <div>
+              <Subheading>Masalah</Subheading>
+              <ul className="mt-5 space-y-5">
+                {PROBLEMS.map(({ icon: Icon, title, text }) => (
+                  <li key={title} className="flex gap-4">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+                      <Icon className="h-6 w-6" aria-hidden />
+                    </span>
+                    <p className="text-slate-700">
+                      <strong className="text-slate-900">{title}.</strong> {text}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="hidden items-center lg:flex">
+              <div className="h-full w-px bg-brand-200" />
+              <Chevron className="-ml-3 bg-white" />
+            </div>
+
+            <div>
+              <Subheading>Peluang: lima mekanisme partisipasi</Subheading>
+              <ul className="mt-5 grid grid-cols-2 gap-3">
+                {MECHANISMS.map((m, i) => {
+                  const Icon = MECHANISM_ICONS[m.key];
+                  return (
+                    <li key={m.key} className={cn(i === 0 && "col-span-2")}>
+                      <a
+                        href={`#mekanisme-${m.key}`}
+                        className={cn(
+                          "flex h-full items-center justify-between gap-3 rounded-md p-4 font-bold transition",
+                          i === 0
+                            ? "bg-brand-600 text-white hover:bg-brand-700"
+                            : i % 2 === 1
+                              ? "bg-slate-100 text-slate-900 hover:bg-brand-50"
+                              : "border border-slate-900 bg-white text-slate-900 hover:border-brand-600",
+                        )}
+                      >
+                        {m.formalName}
+                        <Icon className={cn("h-6 w-6 shrink-0", i === 0 ? "text-brand-100" : "text-brand-600")} aria-hidden />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+
+          <Callout icon={HelpCircle} className="mt-10 items-center">
+            <p className="text-lg font-bold text-slate-900">
+              Bagaimana warga {SITE.city} bisa ikut menentukan solusi kota secara bermakna, bukan sekadar simbolis?
+            </p>
+          </Callout>
+
+          {/* Strategi → Dampak */}
+          <div className="mt-8 grid gap-x-4 gap-y-3 md:grid-cols-[8rem_repeat(3,1fr)]">
+            <span className="hidden items-center md:flex">
+              <span className="w-full rounded-full bg-brand-600 py-2 text-center font-bold text-white">Strategi</span>
+            </span>
+            {STRATEGY_IMPACT.map((s) => (
+              <TintBox key={s.strategy} className="text-sm font-semibold text-slate-800">
+                <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-700 md:hidden">Strategi</span>
+                {s.strategy}
+              </TintBox>
+            ))}
+            <span className="hidden md:block" />
+            {STRATEGY_IMPACT.map((s) => (
+              <span key={`c-${s.strategy}`} className="hidden justify-center md:flex">
+                <ChevronDown className="h-5 w-5 text-brand-500" aria-hidden />
+              </span>
+            ))}
+            <span className="hidden items-center md:flex">
+              <span className="w-full rounded-full bg-brand-600 py-2 text-center font-bold text-white">Dampak</span>
+            </span>
+            {STRATEGY_IMPACT.map((s) => (
+              <TintBox key={`i-${s.strategy}`} className="text-sm">
+                <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-700 md:hidden">Dampak</span>
+                {s.impact}
+              </TintBox>
+            ))}
+          </div>
+        </Section>
+
         {/* Gambaran umum */}
         <Section title="Gambaran umum platform">
           <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr_0.9fr]">
@@ -160,6 +344,53 @@ export default function TentangPage() {
               tanpa pertukaran argumen), dan <Hl>defisit transparansi</Hl> (tindak lanjut tidak jelas). Rembug Warga dirancang
               untuk menjawab ketiganya.
             </p>
+          </div>
+        </Section>
+
+        {/* Lima mekanisme: Tujuan / Cara kerja / Dampak (teks yang sama dengan toggle "Kenapa ini penting?") */}
+        <Section
+          id="mekanisme"
+          title="Lima mekanisme partisipasi, masing-masing dengan tujuan dan dampak yang jelas"
+          description="Di halaman warga, penjelasan ini dilipat di balik tombol “Kenapa ini penting?” agar warga langsung bisa beraksi."
+        >
+          <div className="hidden grid-cols-[15rem_1fr_1fr_1fr] gap-3 pb-2 text-sm font-bold text-slate-500 lg:grid">
+            <span>Mekanisme</span>
+            <span>Tujuan</span>
+            <span>Cara kerja</span>
+            <span>Dampak</span>
+          </div>
+          <ul className="space-y-3">
+            {MECHANISMS.map((m) => {
+              const Icon = MECHANISM_ICONS[m.key];
+              return (
+                <li key={m.key} id={`mekanisme-${m.key}`} className="grid scroll-mt-28 gap-3 lg:grid-cols-[15rem_1fr_1fr_1fr]">
+                  <Link href={m.href} className="group flex items-center gap-3 rounded-md bg-brand-600 p-3 text-white transition hover:bg-brand-700">
+                    <Icon className="h-6 w-6 shrink-0 text-brand-100" aria-hidden />
+                    <span className="min-w-0">
+                      <span className="block font-bold leading-snug">{m.formalName}</span>
+                      <span className="block text-sm text-brand-100">
+                        “{m.title}” <ArrowRight className="inline h-3.5 w-3.5 transition group-hover:translate-x-0.5" aria-hidden />
+                      </span>
+                    </span>
+                  </Link>
+                  {[
+                    { label: "Tujuan", body: m.objective },
+                    { label: "Cara kerja", body: m.how },
+                    { label: "Dampak", body: m.impact },
+                  ].map((c) => (
+                    <TintBox key={c.label} className="text-sm">
+                      <span className="mb-1 block text-xs font-bold uppercase tracking-wider text-brand-700 lg:hidden">{c.label}</span>
+                      {c.body}
+                    </TintBox>
+                  ))}
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mt-6">
+            <ButtonLink href="/panduan#keputusan" variant="outline">
+              Lihat aturan keputusan & tata kelola
+            </ButtonLink>
           </div>
         </Section>
 

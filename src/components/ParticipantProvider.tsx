@@ -4,8 +4,17 @@ import { createContext, useActionState, useCallback, useContext, useEffect, useR
 import Link from "next/link";
 import { saveProfileAction, type ActionResult } from "@/app/actions/participation";
 import { CITIZEN_GROUPS } from "@/content/site";
-import { buttonStyles } from "./ui";
+import { buttonStyles, cn } from "./ui";
 import { submitWithoutReset } from "./useFormSubmit";
+
+const GROUP_EMOJI: Record<string, string> = {
+  pelajar: "🎓",
+  pekerja: "💼",
+  rumah_tangga: "🏠",
+  lansia: "👵",
+  disabilitas: "♿",
+  lainnya: "🙂",
+};
 
 export type ClientParticipant = { name: string | null; group: string } | null;
 
@@ -65,43 +74,46 @@ export function ProfileForm({ participant, onDone }: { participant: ClientPartic
         <h2 id="profil-title" className="text-xl font-bold text-slate-900">
           Kenalan dulu, yuk 👋
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Tanpa login dan tanpa data sensitif. Kategori warga dipakai untuk melihat apakah semua kelompok ikut
-          terwakili dalam keputusan.
-        </p>
+        <p className="mt-1 text-base text-slate-600">Tanpa login. Cukup pilih kamu termasuk kelompok mana.</p>
       </div>
 
       <label className="block">
-        <span className="text-sm font-bold text-slate-800">Nama panggilan (opsional)</span>
+        <span className="text-base font-bold text-slate-800">Nama panggilan (boleh kosong)</span>
         <input
           name="name"
           defaultValue={participant?.name ?? ""}
           maxLength={40}
-          placeholder="Boleh dikosongkan agar anonim"
-          className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-2.5"
+          placeholder="Kosongkan kalau mau anonim"
+          className="mt-1 w-full rounded-xl border border-slate-300 px-3 py-3 text-base"
         />
       </label>
 
       <fieldset>
-        <legend className="text-sm font-bold text-slate-800">Kategori warga *</legend>
-        <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <legend className="text-base font-bold text-slate-800">Kamu termasuk kelompok mana? *</legend>
+        <div className="mt-2 grid grid-cols-2 gap-2">
           {CITIZEN_GROUPS.map((g) => (
-            <label key={g.value} className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50">
-              <input type="radio" name="group" value={g.value} defaultChecked={participant?.group === g.value} required className="accent-brand-700" />
+            <label
+              key={g.value}
+              className="flex min-h-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-slate-200 px-2 py-2.5 text-center text-sm font-bold leading-tight text-slate-800 transition has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50 has-[:focus-visible]:outline has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-brand-600"
+            >
+              <input type="radio" name="group" value={g.value} defaultChecked={participant?.group === g.value} required className="sr-only" />
+              <span className="text-2xl" aria-hidden>
+                {GROUP_EMOJI[g.value]}
+              </span>
               {g.label}
             </label>
           ))}
         </div>
       </fieldset>
 
-      <label className="flex items-start gap-2 text-sm text-slate-700">
-        <input type="checkbox" name="consent" required className="mt-1 accent-brand-700" />
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl bg-slate-50 p-3 text-base text-slate-700">
+        <input type="checkbox" name="consent" required className="mt-0.5 h-5 w-5 shrink-0 accent-brand-700" />
         <span>
-          Saya menyetujui{" "}
+          Saya setuju dengan{" "}
           <Link href="/panduan#aturan" className="font-bold text-brand-800 underline" target="_blank">
-            aturan partisipasi & kebijakan privasi
-          </Link>
-          , dan memahami bahwa ini adalah simulasi akademik.
+            aturan & privasi
+          </Link>{" "}
+          (simulasi akademik).
         </span>
       </label>
 
@@ -112,11 +124,11 @@ export function ProfileForm({ participant, onDone }: { participant: ClientPartic
       )}
 
       <div className="flex gap-2">
-        <button type="submit" disabled={pending} className={buttonStyles.primary}>
-          {pending ? "Menyimpan…" : "Simpan & ikut rembug"}
+        <button type="submit" disabled={pending} className={cn(buttonStyles.primary, "min-h-12 flex-1 text-base")}>
+          {pending ? "Menyimpan…" : "Simpan & lanjut"}
         </button>
         {onDone && (
-          <button type="button" onClick={onDone} className={buttonStyles.ghost}>
+          <button type="button" onClick={onDone} className={cn(buttonStyles.ghost, "min-h-12 text-base")}>
             Nanti saja
           </button>
         )}

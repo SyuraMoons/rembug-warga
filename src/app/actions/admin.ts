@@ -58,6 +58,44 @@ export async function setHiddenAction(formData: FormData): Promise<void> {
   refresh();
 }
 
+const deleteSchema = z.object({
+  type: z.enum(["proposal", "comment", "statement"]),
+  id: z.guid(),
+  reason: z.string().trim().max(200).optional(),
+});
+
+/**
+ * Hapus permanen. Argumen & suara milik usulan (dan suara milik pernyataan)
+ * ikut terhapus lewat ON DELETE CASCADE. Laporan tidak punya foreign key,
+ * jadi dibersihkan manual. Isi konten tidak dicatat di log publik.
+ */
+export async function deleteContentAction(formData: FormData): Promise<void> {
+  await requireAdmin();
+  const parsed = deleteSchema.parse({
+    type: formData.get("type"),
+    id: formData.get("id"),
+    reason: formData.get("reason") || undefined,
+  });
+  const supabase = db();
+
+  const reportTargets = [parsed.id];
+  if (parsed.type === "proposal") {
+    const { data: comments } = await supabase.from("comments").select("id").eq("proposal_id", parsed.id);
+    reportTargets.push(...(comments ?? []).map((c) => c.id as string));
+  }
+
+  const { error } = await supabase.from(TABLE[parsed.type]).delete().eq("id", parsed.id);
+  if (error) throw error;
+  await supabase.from("reports").delete().in("target_id", reportTargets);
+  await supabase.from("moderation_log").insert({
+    target_type: parsed.type,
+    target_id: parsed.id,
+    action: `${LABEL[parsed.type]} dihapus permanen`,
+    reason: parsed.reason ?? "Melanggar aturan partisipasi",
+  });
+  refresh();
+}
+
 export async function dismissReportAction(formData: FormData): Promise<void> {
   await requireAdmin();
   const id = z.guid().parse(formData.get("id"));

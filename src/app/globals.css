@@ -23,6 +23,53 @@
   --color-brand-800: #1e37af;
   --color-brand-900: #1e338a;
   --color-brand-950: #172154;
+
+  /*
+   * Animasi umpan balik: kecil, cepat, dan hanya untuk menunjukkan "apa yang barusan terjadi"
+   * (suara masuk, bar terisi, berhasil terkirim). Semuanya mati saat prefers-reduced-motion.
+   */
+  --animate-pop: pop 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-rise: rise 360ms ease-out both;
+  --animate-grow-x: grow-x 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-check: check 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes pop {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.35);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Hanya titik awal: lebar akhirnya mengikuti style inline elemen. */
+  @keyframes grow-x {
+    from {
+      width: 0;
+    }
+  }
+  @keyframes check {
+    0% {
+      opacity: 0;
+      transform: scale(0) rotate(-25deg);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 :root {
@@ -75,6 +122,67 @@ dialog::backdrop {
   background: rgb(15 23 42 / 0.55);
 }
 
+/* ---------- View transitions (React <ViewTransition>) ----------
+ * Dipakai hanya di tempat yang bermakna: pindah langkah di /coba dan munculnya hasil
+ * setelah warga memilih. Halaman lain tidak dianimasikan. */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    350ms ease-in-out both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    210ms ease-out 120ms both vt-fade,
+    350ms ease-in-out both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    350ms ease-in-out both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    210ms ease-out 120ms both vt-fade,
+    350ms ease-in-out both vt-slide;
+}
+::view-transition-new(.reveal) {
+  animation: 320ms ease-out both vt-rise;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes vt-slide {
+  from {
+    translate: var(--slide-offset);
+  }
+  to {
+    translate: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -82,5 +190,11 @@ dialog::backdrop {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }

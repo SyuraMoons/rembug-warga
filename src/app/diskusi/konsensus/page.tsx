@@ -4,9 +4,9 @@ import { ISSUES, isIssueSlug } from "@/content/issues";
 import { getMyStatementVotes, getStatementResults } from "@/lib/data";
 import { getDeviceId } from "@/lib/participant";
 import { AddStatementForm, StatementCard } from "@/components/Consensus";
-import { ButtonLink, Container, EmptyState, IssueIcon, ObjectiveStrip, PageHeader, cn } from "@/components/ui";
+import { ButtonLink, Container, EmptyState, IssueIcon, PageHeader, Why, cn } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Rembug Konsensus" };
+export const metadata: Metadata = { title: "Setuju atau Tidak?" };
 export const dynamic = "force-dynamic";
 
 export default async function KonsensusPage({ searchParams }: PageProps<"/diskusi/konsensus">) {
@@ -18,24 +18,13 @@ export default async function KonsensusPage({ searchParams }: PageProps<"/diskus
   return (
     <>
       <PageHeader
-        eyebrow="Mekanisme 5 · Rembug Konsensus"
-        title="Mencari titik temu yang bisa diterima"
-        accent="lintas kelompok"
-        description={
-          <>
-            Tanggapi setiap pernyataan dengan <strong>Setuju</strong>, <strong>Tidak setuju</strong>, atau <strong>Ragu</strong>.
-            Tujuannya bukan mencari pemenang, melainkan menemukan <em>titik temu</em> yang bisa diterima lintas kelompok
-            warga, serta memetakan <em>titik beda</em> yang masih perlu dirembugkan.
-          </>
-        }
+        title="Setuju"
+        accent="atau tidak?"
+        description="Baca pernyataan, lalu pilih jawabanmu. Hasilnya muncul setelah kamu memilih."
       />
       <Container className="py-8">
-        <ObjectiveStrip
-          objective="Menemukan pernyataan kebijakan yang disetujui lintas kelompok warga, bukan hanya oleh mayoritas."
-          how="Tanggapi pernyataan dengan Setuju, Tidak setuju, atau Ragu. Hasil baru tampil setelah kamu memilih."
-          impact="Titik temu menjadi rekomendasi kebijakan; titik beda menjadi agenda rembug lanjutan."
-        />
-        <nav aria-label="Pilih isu" className="mt-10 flex flex-wrap gap-2">
+        <Why mechanism="konsensus" />
+        <nav aria-label="Pilih isu" className="mt-8 flex flex-wrap gap-2">
           {ISSUES.map((i) => (
             <Link
               key={i.slug}
@@ -53,10 +42,10 @@ export default async function KonsensusPage({ searchParams }: PageProps<"/diskus
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-brand-50 p-4">
           <p className="font-semibold text-brand-900">
-            Kamu sudah menanggapi <strong>{answered}</strong> dari {statements.length} pernyataan.
+            Kamu sudah menjawab <strong>{answered}</strong> dari {statements.length} pernyataan.
           </p>
           <ButtonLink href="/hasil#konsensus" variant="outline">
-            Lihat peta konsensus
+            Lihat di mana warga sepakat
           </ButtonLink>
         </div>
 

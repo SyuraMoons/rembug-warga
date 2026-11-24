@@ -1,22 +1,36 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { submitProposalAction, type ActionResult } from "@/app/actions/participation";
 import { ISSUES, type IssueSlug } from "@/content/issues";
-import { KECAMATAN_SURABAYA } from "@/content/site";
+import { KECAMATAN_SURABAYA, SUPPORT_THRESHOLD } from "@/content/site";
 import { useParticipant } from "./ParticipantProvider";
 import { IssueIcon, buttonStyles, cn } from "./ui";
 import { submitWithoutReset } from "./useFormSubmit";
+
+const STARTERS = ["Masalahnya: ", "Yang terdampak: ", "Usulanku: "];
 
 export function ProposalForm({ defaultIssue }: { defaultIssue?: IssueSlug }) {
   const { participant, requireProfile } = useParticipant();
   const [state, action, pending] = useActionState<ActionResult, FormData>(submitProposalAction, null);
   const [body, setBody] = useState("");
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+
+  // Kalimat pembuka yang bisa diketuk, agar warga tidak bingung harus menulis apa.
+  function addStarter(text: string) {
+    setBody((b) => (b.trim() ? `${b.trimEnd()}\n${text}` : text));
+    requestAnimationFrame(() => {
+      const el = bodyRef.current;
+      if (!el) return;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    });
+  }
 
   return (
     <form onSubmit={submitWithoutReset(action, requireProfile)} className="space-y-6">
       <fieldset>
-        <legend className="text-sm font-bold text-slate-800">1. Isu apa yang ingin kamu usulkan? *</legend>
+        <legend className="text-base font-bold text-slate-800">1. Soal apa? *</legend>
         <div className="mt-2 grid gap-2 sm:grid-cols-3">
           {ISSUES.map((issue) => (
             <label
@@ -34,23 +48,37 @@ export function ProposalForm({ defaultIssue }: { defaultIssue?: IssueSlug }) {
       </fieldset>
 
       <label className="block">
-        <span className="text-sm font-bold text-slate-800">2. Judul usulan *</span>
+        <span className="text-base font-bold text-slate-800">2. Judul singkat *</span>
         <input
           name="title"
           required
           minLength={5}
           maxLength={120}
           placeholder="Contoh: Halte depan SMPN dekat rumah diberi atap dan lampu"
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"
+          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base"
         />
       </label>
 
-      <label className="block">
-        <span className="text-sm font-bold text-slate-800">3. Uraikan masalah & usulanmu *</span>
-        <span className="mt-0.5 block text-xs text-slate-500">
-          Apa masalahnya, siapa yang terdampak, dan apa solusi yang kamu usulkan?
-        </span>
+      <div>
+        <label htmlFor="proposal-body" className="block text-base font-bold text-slate-800">
+          3. Ceritakan idemu *
+        </label>
+        <p className="mt-0.5 text-sm text-slate-600">Bingung mulai dari mana? Ketuk salah satu:</p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {STARTERS.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => addStarter(t)}
+              className="min-h-10 rounded-full border-2 border-brand-200 bg-white px-4 py-1.5 text-sm font-bold text-brand-800 transition hover:bg-brand-50 active:scale-95"
+            >
+              + {t.replace(/:\s*$/, "")}
+            </button>
+          ))}
+        </div>
         <textarea
+          id="proposal-body"
+          ref={bodyRef}
           name="body"
           required
           minLength={20}
@@ -58,16 +86,16 @@ export function ProposalForm({ defaultIssue }: { defaultIssue?: IssueSlug }) {
           rows={6}
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5"
+          className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-base"
         />
-        <span className={cn("mt-0.5 block text-right text-xs", body.length > 0 && body.length < 20 ? "text-rose-600" : "text-slate-400")}>
-          {body.length}/2000 {body.length > 0 && body.length < 20 && "· minimal 20 karakter"}
+        <span className={cn("mt-0.5 block text-right text-sm", body.length > 0 && body.length < 20 ? "text-rose-600" : "text-slate-500")}>
+          {body.length}/2000 {body.length > 0 && body.length < 20 && "· minimal 20 huruf"}
         </span>
-      </label>
+      </div>
 
       <label className="block">
-        <span className="text-sm font-bold text-slate-800">4. Lokasi (kecamatan, opsional)</span>
-        <select name="kecamatan" defaultValue="" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5">
+        <span className="text-base font-bold text-slate-800">4. Di kecamatan mana? (boleh dilewati)</span>
+        <select name="kecamatan" defaultValue="" className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-3 text-base">
           <option value="">Tidak spesifik / seluruh kota</option>
           {KECAMATAN_SURABAYA.map((k) => (
             <option key={k} value={k}>
@@ -78,17 +106,16 @@ export function ProposalForm({ defaultIssue }: { defaultIssue?: IssueSlug }) {
         </select>
       </label>
 
-      <div className="rounded-lg bg-brand-50 p-4 text-sm text-slate-700">
-        Usulanmu akan langsung tampil publik dan bisa didukung serta didiskusikan warga lain. Usulan yang mencapai
-        ambang dukungan akan berstatus <strong>Dipertimbangkan</strong> dan wajib mendapat tanggapan.{" "}
+      <p className="rounded-lg bg-brand-50 p-4 text-base text-slate-700">
+        Usulanmu langsung tampil untuk semua warga. {SUPPORT_THRESHOLD} dukungan = pemerintah wajib menjawab.{" "}
         {participant ? (
           <>
             Kamu tampil sebagai <strong>{participant.name ?? "Anonim"}</strong>.
           </>
         ) : (
-          "Kamu akan diminta mengisi profil singkat sebelum mengirim."
+          "Nanti kamu diminta mengisi profil singkat."
         )}
-      </div>
+      </p>
 
       {state && !state.ok && (
         <p role="alert" className="rounded-xl bg-rose-50 p-3 text-sm font-semibold text-rose-700">

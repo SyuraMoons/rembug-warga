@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MessagesSquare, Scale } from "lucide-react";
+import { ArrowRight, Ear, HeartHandshake, MessageSquareText, MessagesSquare, Scale, SearchCheck } from "lucide-react";
 import { isIssueSlug } from "@/content/issues";
 import { getProposals } from "@/lib/data";
 import { sortProposals } from "@/lib/sort";
 import { FilterBar, parseSort } from "@/components/FilterBar";
-import { ButtonLink, Container, EmptyState, IssueBadge, NumberCircle, ObjectiveStrip, PageHeader, Section, StatusBadge } from "@/components/ui";
+import { ButtonLink, Container, EmptyState, IssueBadge, PageHeader, Section, StatusBadge, Why } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Diskusi & Deliberasi" };
+export const metadata: Metadata = { title: "Diskusi" };
 export const dynamic = "force-dynamic";
 
 const RULES = [
-  { title: "Serang gagasan, bukan orang", text: "Kritik boleh tajam, tetapi tetap santun." },
-  { title: "Beri alasan", text: "Jelaskan mengapa kamu pro atau kontra, bukan sekadar setuju atau tidak." },
-  { title: "Dengarkan sisi lain", text: "Baca argumen yang berseberangan sebelum menulis." },
-  { title: "Cek fakta", text: "Sebutkan sumber jika menyampaikan data." },
+  { icon: HeartHandshake, title: "Bahas idenya, bukan orangnya" },
+  { icon: MessageSquareText, title: "Sertakan alasanmu" },
+  { icon: Ear, title: "Baca pendapat yang berbeda" },
+  { icon: SearchCheck, title: "Sebut sumber kalau pakai data" },
 ];
 
 export default async function DiskusiPage({ searchParams }: PageProps<"/diskusi">) {
@@ -26,47 +26,48 @@ export default async function DiskusiPage({ searchParams }: PageProps<"/diskusi"
   return (
     <>
       <PageHeader
-        eyebrow="Mekanisme 2 · Diskusi & deliberasi"
-        title="Demokrasi bukan hanya menghitung suara, tetapi juga"
-        accent="menimbang alasan"
-        description="Di sini warga bertukar argumen pro dan kontra serta mencari titik temu."
+        title="Beri pendapatmu tentang"
+        accent="usulan warga"
+        description="Setuju atau tidak, sampaikan alasanmu. Dari situ warga mencari jalan tengah."
       />
       <Container>
-        <div className="pt-8">
-          <ObjectiveStrip
-            objective="Menguji setiap usulan lewat argumen dari dua sisi sebelum diputuskan."
-            how="Setiap usulan punya kolom argumen pro dan kontra; Rembug Konsensus memetakan pernyataan yang disetujui lintas kelompok."
-            impact="Keputusan lebih matang dan berbasis alasan, dengan titik temu dan titik beda yang terlihat jelas."
-          />
-        </div>
-        <div className="grid gap-4 py-8 md:grid-cols-2">
-          <Link href="#forum" className="rounded-lg border border-slate-200 bg-white p-6 transition hover:border-brand-400 hover:shadow-md">
-            <MessagesSquare className="h-8 w-8 text-brand-600" aria-hidden />
-            <h2 className="mt-3 text-xl font-bold text-slate-900">Forum pro–kontra usulan</h2>
-            <p className="mt-1 text-slate-600">Setiap usulan memiliki dua kolom argumen: pendukung dan penentang. Pilih usulan, baca kedua sisi, lalu sampaikan pendapatmu.</p>
+        <div className="grid gap-4 pt-8 md:grid-cols-2">
+          <Link href="#forum" className="group flex items-center gap-4 rounded-xl border-2 border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+              <MessagesSquare className="h-7 w-7" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-xl font-black text-slate-900">Komentari usulan</span>
+              <span className="mt-1 block text-base text-slate-600">Pilih usulan, baca pendapat warga, lalu tulis pendapatmu.</span>
+            </span>
           </Link>
-          <Link href="/diskusi/konsensus" className="rounded-lg bg-brand-600 p-6 text-white transition hover:bg-brand-700 hover:shadow-md">
-            <Scale className="h-8 w-8 text-brand-100" aria-hidden />
-            <h2 className="mt-3 text-xl font-bold">Rembug Konsensus</h2>
-            <p className="mt-1 text-brand-50">Tanggapi pernyataan dengan Setuju atau Tidak, lalu lihat di mana warga sepakat dan di mana masih berbeda. Terinspirasi vTaiwan & Pol.is.</p>
+          <Link href="/diskusi/konsensus" className="group flex items-center gap-4 rounded-xl bg-brand-600 p-6 text-white transition hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-md">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/15">
+              <Scale className="h-7 w-7" aria-hidden />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-xl font-black">Setuju atau tidak?</span>
+              <span className="mt-1 block text-base text-brand-50">Jawab pernyataan singkat, lalu lihat di mana warga sepakat.</span>
+            </span>
+            <ArrowRight className="ml-auto h-6 w-6 shrink-0 transition group-hover:translate-x-1" aria-hidden />
           </Link>
         </div>
+        <Why mechanism="diskusi" className="mt-6" />
 
-        <Section title="Empat aturan berdebat sehat">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {RULES.map((r, i) => (
-              <div key={r.title} className="flex gap-3">
-                <NumberCircle n={i + 1} />
-                <div>
-                  <h3 className="font-bold text-slate-900">{r.title}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{r.text}</p>
-                </div>
-              </div>
+        <Section title="Aturan berdiskusi">
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {RULES.map(({ icon: Icon, title }) => (
+              <li key={title} className="flex items-center gap-3">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-600 text-white">
+                  <Icon className="h-6 w-6" aria-hidden />
+                </span>
+                <span className="text-base font-bold text-slate-900">{title}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </Section>
 
-        <Section id="forum" title="Forum usulan" description="Pilih usulan untuk membaca dan menambahkan argumen.">
+        <Section id="forum" title="Pilih usulan untuk dikomentari">
           <FilterBar basePath="/diskusi" issue={issue} sort={sort} />
           {proposals.length ? (
             <ul className="mt-4 divide-y divide-slate-100 overflow-hidden rounded-lg border border-slate-200 bg-white">
@@ -83,9 +84,9 @@ export default async function DiskusiPage({ searchParams }: PageProps<"/diskusi"
                         <p className="mt-1.5 font-bold text-slate-900">{p.title}</p>
                       </div>
                       <div className="flex shrink-0 items-center gap-3 text-sm">
-                        <span className="rounded-md bg-brand-50 px-2.5 py-1 font-bold text-brand-800">{p.pro} pro</span>
-                        <span className="rounded-lg bg-rose-50 px-2.5 py-1 font-bold text-rose-700">{p.kontra} kontra</span>
-                        <span className="w-24 text-right text-slate-500">{total} argumen →</span>
+                        <span className="rounded-md bg-brand-50 px-2.5 py-1 font-bold text-brand-800">{p.pro} setuju</span>
+                        <span className="rounded-md bg-rose-50 px-2.5 py-1 font-bold text-rose-700">{p.kontra} tidak</span>
+                        <span className="w-28 text-right text-slate-600">{total} komentar →</span>
                       </div>
                     </Link>
                   </li>
@@ -99,7 +100,7 @@ export default async function DiskusiPage({ searchParams }: PageProps<"/diskusi"
           )}
           <div className="mt-4">
             <ButtonLink href="/usulan/baru" variant="accent">
-              Ajukan usulan baru
+              Tulis usulan baru
             </ButtonLink>
           </div>
         </Section>
