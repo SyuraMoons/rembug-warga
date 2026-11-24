@@ -7,6 +7,7 @@ import { PROPOSAL_STATUS } from "@/content/site";
 import { ISSUE_BY_SLUG } from "@/content/issues";
 import { adminLogoutAction, dismissReportAction, setHiddenAction, updateProposalStatusAction } from "@/app/actions/admin";
 import { AdminLogin } from "@/components/AdminLogin";
+import { DeleteButton } from "@/components/DeleteButton";
 import { Card, Container, IssueBadge, IssueIcon, Section, StatusBadge, buttonStyles, cn } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Moderasi", robots: { index: false } };
@@ -69,6 +70,7 @@ export default async function AdminPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <HideForm type={r.target_type} id={r.target_id} hidden={r.hidden} />
+                  <DeleteButton type={r.target_type} id={r.target_id} />
                   <form action={dismissReportAction}>
                     <input type="hidden" name="id" value={r.id} />
                     <button className="rounded-lg bg-white px-2.5 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">Abaikan</button>
@@ -93,7 +95,10 @@ export default async function AdminPage() {
                     {p.support} dukung · {p.oppose} tolak · {p.pro + p.kontra + p.netral} argumen
                   </span>
                 </div>
-                <HideForm type="proposal" id={p.id} hidden={p.hidden} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <HideForm type="proposal" id={p.id} hidden={p.hidden} />
+                  <DeleteButton type="proposal" id={p.id} note="Semua argumen & suara usulan ini ikut terhapus." />
+                </div>
               </div>
               <Link href={`/usulan/${p.id}`} className="mt-1 block font-bold text-slate-900 hover:underline">
                 {p.title}
@@ -129,7 +134,10 @@ export default async function AdminPage() {
                 <span className="text-xs font-bold uppercase text-slate-500">{c.stance}</span> · <span className="text-xs text-slate-500">{c.proposal_title}</span>
                 <p className="text-slate-800">{c.body}</p>
               </div>
-              <HideForm type="comment" id={c.id} hidden={c.hidden} />
+              <div className="flex flex-wrap items-center gap-2">
+                <HideForm type="comment" id={c.id} hidden={c.hidden} />
+                <DeleteButton type="comment" id={c.id} />
+              </div>
             </li>
           ))}
         </ul>
@@ -142,7 +150,10 @@ export default async function AdminPage() {
               <p className="flex min-w-0 items-start gap-1.5 text-slate-800">
                 <IssueIcon slug={s.issue_slug} className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" /> {s.text} {s.is_seed && <span className="text-xs text-slate-400">(pemantik)</span>}
               </p>
-              <HideForm type="statement" id={s.id} hidden={s.hidden} />
+              <div className="flex flex-wrap items-center gap-2">
+                <HideForm type="statement" id={s.id} hidden={s.hidden} />
+                <DeleteButton type="statement" id={s.id} note="Semua jawaban warga untuk pernyataan ini ikut terhapus." />
+              </div>
             </li>
           ))}
         </ul>

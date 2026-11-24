@@ -27,23 +27,23 @@ with p as (
   ('11111111-1111-1111-1111-111111111111', 'sampah',
    'Tong pilah tiga warna di setiap gang',
    'Banyak warga sebenarnya mau memilah sampah, tapi tidak ada wadah terpisah di gang. Saya usul disediakan tong tiga warna (organik, anorganik, residu) di setiap gang beserta stiker panduan sederhana, lalu hasil pilahan organik diolah jadi kompos di tingkat RW.',
-   'Tambaksari', 'Tim Rembug Warga (contoh)', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+   'Tambaksari', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
   ('22222222-2222-2222-2222-222222222222', 'transportasi',
    'Halte depan sekolah diberi atap dan lampu',
    'Siswa yang pulang sore sering menunggu bus di halte tanpa atap dan tanpa penerangan. Saat hujan mereka berteduh di emperan toko dan bisa ketinggalan bus. Usul: prioritaskan renovasi halte yang berada dalam radius 300 meter dari sekolah.',
-   'Sukolilo', 'Tim Rembug Warga (contoh)', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+   'Sukolilo', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
   ('33333333-3333-3333-3333-333333333333', 'perpustakaan',
    'Balai RW jadi ruang belajar malam',
    'Balai RW sering kosong di malam hari. Bagaimana kalau dibuka sebagai ruang belajar pelajar pukul 18.00–22.00 dengan Wi-Fi gratis dan rak buku sumbangan warga, dijaga bergiliran oleh karang taruna?',
-   'Wonokromo', 'Tim Rembug Warga (contoh)', 'lainnya', '00000000-0000-0000-0000-000000000000', true)
+   'Wonokromo', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true)
   returning id
 )
 select count(*) from p;
 
 insert into public.comments (proposal_id, stance, body, author_name, author_group, device_id, is_seed) values
-  ('11111111-1111-1111-1111-111111111111', 'pro', 'Setuju, di kampung saya sudah dicoba dan sampah yang ke TPS berkurang hampir separuh.', 'Contoh', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
-  ('11111111-1111-1111-1111-111111111111', 'kontra', 'Percuma kalau truk pengangkut tetap mencampur semua sampah. Harus dibenahi sistem angkutnya dulu.', 'Contoh', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
-  ('22222222-2222-2222-2222-222222222222', 'pro', 'Penting untuk keselamatan siswa, apalagi siswi yang pulang sore.', 'Contoh', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
-  ('22222222-2222-2222-2222-222222222222', 'netral', 'Perlu dicek juga apakah trotoar menuju halte sudah aman dan tidak dipakai parkir.', 'Contoh', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
-  ('33333333-3333-3333-3333-333333333333', 'pro', 'Ide bagus dan murah karena memakai fasilitas yang sudah ada.', 'Contoh', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
-  ('33333333-3333-3333-3333-333333333333', 'kontra', 'Siapa yang menanggung listrik dan keamanan? Jangan sampai membebani pengurus RW.', 'Contoh', 'lainnya', '00000000-0000-0000-0000-000000000000', true);
+  ('11111111-1111-1111-1111-111111111111', 'pro', 'Setuju, di kampung saya sudah dicoba dan sampah yang ke TPS berkurang hampir separuh.', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+  ('11111111-1111-1111-1111-111111111111', 'kontra', 'Percuma kalau truk pengangkut tetap mencampur semua sampah. Harus dibenahi sistem angkutnya dulu.', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+  ('22222222-2222-2222-2222-222222222222', 'pro', 'Penting untuk keselamatan siswa, apalagi siswi yang pulang sore.', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+  ('22222222-2222-2222-2222-222222222222', 'netral', 'Perlu dicek juga apakah trotoar menuju halte sudah aman dan tidak dipakai parkir.', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+  ('33333333-3333-3333-3333-333333333333', 'pro', 'Ide bagus dan murah karena memakai fasilitas yang sudah ada.', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true),
+  ('33333333-3333-3333-3333-333333333333', 'kontra', 'Siapa yang menanggung listrik dan keamanan? Jangan sampai membebani pengurus RW.', 'Tim Rembug Warga', 'lainnya', '00000000-0000-0000-0000-000000000000', true);
