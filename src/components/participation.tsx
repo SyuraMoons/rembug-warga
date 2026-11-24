@@ -24,24 +24,38 @@ export function VoteButtons({
   support: number;
   oppose: number;
   myVote?: 1 | -1;
-  size?: "sm" | "md";
+  size?: "md" | "lg";
 }) {
   const { requireProfile } = useParticipant();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  // Diisi setelah suara berhasil: memicu animasi angka & pesan terima kasih,
+  // sehingga warga langsung melihat bahwa suaranya masuk (tanpa perlu membaca penjelasan).
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   function vote(value: 1 | -1) {
     if (!requireProfile()) return;
     setError(null);
+    const withdrawing = myVote === value;
     start(async () => {
       const res = await castVoteAction(proposalId, value);
-      if (res && !res.ok) setError(res.error);
+      if (res && !res.ok) {
+        setError(res.error);
+        setFeedback(null);
+      } else {
+        setFeedback(withdrawing ? "Suaramu dibatalkan." : value === 1 ? "Terima kasih! Dukunganmu tercatat." : "Suaramu tercatat.");
+      }
     });
   }
 
   const base = cn(
-    "inline-flex items-center gap-1.5 rounded-xl border font-bold transition disabled:opacity-60",
-    size === "sm" ? "px-3 py-1.5 text-sm" : "px-4 py-2.5",
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 font-bold transition active:scale-95 disabled:opacity-60",
+    size === "lg" ? "flex-1 px-6 py-3 text-lg" : "px-4 py-2 text-base",
+  );
+  const count = (n: number) => (
+    <span key={n} className={cn("inline-block tabular-nums", feedback && "animate-pop")}>
+      {n}
+    </span>
   );
   return (
     <div>
@@ -53,7 +67,7 @@ export function VoteButtons({
           aria-pressed={myVote === 1}
           className={cn(base, myVote === 1 ? "border-brand-700 bg-brand-700 text-white" : "border-brand-200 bg-white text-brand-800 hover:bg-brand-50")}
         >
-          <ThumbsUp className="h-4 w-4" aria-hidden /> Dukung <span className="tabular-nums">({support})</span>
+          <ThumbsUp className={size === "lg" ? "h-6 w-6" : "h-5 w-5"} aria-hidden /> Dukung {count(support)}
         </button>
         <button
           type="button"
@@ -62,11 +76,20 @@ export function VoteButtons({
           aria-pressed={myVote === -1}
           className={cn(base, myVote === -1 ? "border-rose-600 bg-rose-600 text-white" : "border-rose-200 bg-white text-rose-700 hover:bg-rose-50")}
         >
-          <ThumbsDown className="h-4 w-4" aria-hidden /> Tolak <span className="tabular-nums">({oppose})</span>
+          <ThumbsDown className={size === "lg" ? "h-6 w-6" : "h-5 w-5"} aria-hidden /> Tolak {count(oppose)}
         </button>
       </div>
-      {myVote && <p className="mt-1.5 text-xs text-slate-500">Klik pilihanmu lagi untuk menarik suara.</p>}
-      {error && <p role="alert" className="mt-1.5 text-sm font-semibold text-rose-700">{error}</p>}
+      {error ? (
+        <p role="alert" className="mt-2 text-sm font-semibold text-rose-700">
+          {error}
+        </p>
+      ) : feedback ? (
+        <p key={feedback} role="status" className="mt-2 animate-rise text-sm font-bold text-brand-800">
+          {feedback} {myVote && <span className="font-normal text-slate-600">Ketuk lagi untuk membatalkan.</span>}
+        </p>
+      ) : (
+        myVote && <p className="mt-2 text-sm text-slate-600">Ketuk pilihanmu lagi untuk membatalkan.</p>
+      )}
     </div>
   );
 }
@@ -97,10 +120,11 @@ export function ReportButton({ type, id }: { type: "proposal" | "comment" | "sta
 }
 
 // ---------- Form argumen pro/kontra ----------
+// Nilai di database tetap pro/kontra/netral; warga hanya melihat label sederhana.
 const STANCES = [
-  { value: "pro", label: "Pro", className: "has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50" },
-  { value: "kontra", label: "Kontra", className: "has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50" },
-  { value: "netral", label: "Netral / Pertanyaan", className: "has-[:checked]:border-slate-500 has-[:checked]:bg-slate-50" },
+  { value: "pro", label: "Setuju", className: "has-[:checked]:border-brand-600 has-[:checked]:bg-brand-50" },
+  { value: "kontra", label: "Tidak setuju", className: "has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50" },
+  { value: "netral", label: "Mau tanya", className: "has-[:checked]:border-slate-500 has-[:checked]:bg-slate-50" },
 ];
 
 export function CommentForm({ proposalId }: { proposalId: string }) {
@@ -119,12 +143,12 @@ export function CommentForm({ proposalId }: { proposalId: string }) {
       className="space-y-3 rounded-lg border border-slate-200 border-t-4 border-t-brand-600 bg-white p-5"
     >
       <input type="hidden" name="proposalId" value={proposalId} />
-      <h3 className="font-bold text-slate-900">Tambahkan argumenmu</h3>
+      <h3 className="text-lg font-bold text-slate-900">Tulis pendapatmu</h3>
       <fieldset>
-        <legend className="sr-only">Posisi argumen</legend>
+        <legend className="sr-only">Kamu setuju dengan usulan ini?</legend>
         <div className="flex flex-wrap gap-2">
           {STANCES.map((s) => (
-            <label key={s.value} className={cn("cursor-pointer rounded-xl border border-slate-200 px-3 py-2 text-sm font-semibold", s.className)}>
+            <label key={s.value} className={cn("flex min-h-11 cursor-pointer items-center rounded-xl border-2 border-slate-200 px-4 py-2 text-base font-semibold", s.className)}>
               <input type="radio" name="stance" value={s.value} required className="sr-only" defaultChecked={s.value === "pro"} />
               {s.label}
             </label>
@@ -132,28 +156,28 @@ export function CommentForm({ proposalId }: { proposalId: string }) {
         </div>
       </fieldset>
       <label className="block">
-        <span className="sr-only">Isi argumen</span>
+        <span className="sr-only">Isi pendapat</span>
         <textarea
           name="body"
           required
           minLength={3}
           maxLength={1000}
           rows={3}
-          placeholder="Sampaikan alasanmu. Fokus pada gagasan, bukan pada orangnya."
-          className="w-full rounded-xl border border-slate-300 px-3 py-2.5"
+          placeholder="Kenapa kamu setuju atau tidak? Bahas idenya, bukan orangnya."
+          className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-base"
         />
       </label>
       {state && (
-        <p role="status" className={cn("text-sm font-semibold", state.ok ? "text-brand-700" : "text-rose-700")}>
-          {state.ok ? state.message : state.error}
+        <p key={state.ok ? state.message : state.error} role="status" className={cn("animate-rise text-base font-semibold", state.ok ? "text-brand-700" : "text-rose-700")}>
+          {state.ok ? `✓ ${state.message}` : state.error}
         </p>
       )}
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-slate-500">
-          {participant ? `Tampil sebagai ${participant.name ?? "Anonim"}` : "Kamu akan diminta mengisi profil singkat."}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-600">
+          {participant ? `Tampil sebagai ${participant.name ?? "Anonim"}` : "Nanti kamu diminta mengisi profil singkat."}
         </p>
-        <button type="submit" disabled={pending} className={buttonStyles.primary}>
-          {pending ? "Mengirim…" : "Kirim argumen"}
+        <button type="submit" disabled={pending} className={cn(buttonStyles.primary, "min-h-11 px-5 text-base")}>
+          {pending ? "Mengirim…" : "Kirim pendapat"}
         </button>
       </div>
     </form>

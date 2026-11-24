@@ -11,10 +11,9 @@ export default function IsuPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Isu publik"
-        title="Tiga isu kota yang dirembugkan, dipetakan dalam satu"
-        accent="pohon masalah"
-        description="Setiap isu diurai menjadi akar masalah, kelompok terdampak, dan alternatif solusi. Pilih satu isu untuk mempelajarinya dan ikut terlibat."
+        title="Tiga masalah kota yang"
+        accent="kita bahas"
+        description="Pilih satu masalah untuk melihat penyebabnya dan ikut memberi ide."
       />
 
       <Container className="py-12">
@@ -70,9 +69,9 @@ export default function IsuPage() {
 
               <Link
                 href={`/isu/${issue.slug}`}
-                className="ml-4 mt-4 rounded-md bg-brand-600 px-4 py-3 text-center font-bold text-white transition hover:bg-brand-700"
+                className="ml-4 mt-4 rounded-md bg-brand-600 px-4 py-3.5 text-center text-base font-bold text-white transition hover:bg-brand-700"
               >
-                Buka analisis {issue.shortTitle.toLowerCase()} →
+                Lihat & ikut: {issue.shortTitle} →
               </Link>
             </section>
           ))}

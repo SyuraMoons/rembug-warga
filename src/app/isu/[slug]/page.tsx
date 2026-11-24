@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Coins, MessagesSquare, Scale, Send, ThumbsDown, ThumbsUp, Users } from "lucide-react";
+import { BookOpenText, ChevronDown, Coins, MessagesSquare, Scale, Send, ThumbsDown, ThumbsUp, Users } from "lucide-react";
 import { ISSUE_BY_SLUG, isIssueSlug } from "@/content/issues";
 import { getMyVotes, getProposals } from "@/lib/data";
 import { getDeviceId } from "@/lib/participant";
@@ -39,25 +39,72 @@ export default async function IssueDetailPage({ params }: PageProps<"/isu/[slug]
       <header className="border-b border-slate-200 bg-white">
         <Container className="py-10 sm:py-12">
           <p className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
-            <IssueIcon slug={issue.slug} className="h-4 w-4" /> Isu publik · {issue.title}
+            <IssueIcon slug={issue.slug} className="h-4 w-4" /> {issue.title}
           </p>
           {/* Action title: kesimpulan isu, bukan sekadar nama isu */}
           <h1 className="mt-4 max-w-4xl text-3xl font-black leading-tight tracking-tight text-slate-900 sm:text-[2.4rem]">{issue.headline}</h1>
           <div className="mt-6 flex flex-wrap gap-2">
-            <ButtonLink href={`/usulan/baru?isu=${issue.slug}`} variant="accent">
-              <Send className="h-4 w-4" aria-hidden /> Ajukan usulan
+            <ButtonLink href={`/usulan/baru?isu=${issue.slug}`} variant="accent" className="px-5 py-3 text-base">
+              <Send className="h-5 w-5" aria-hidden /> Usulkan ide
             </ButtonLink>
-            <ButtonLink href={`/diskusi/konsensus?isu=${issue.slug}`} variant="outline">
-              <Scale className="h-4 w-4" aria-hidden /> Rembug Konsensus
+            <ButtonLink href={`/diskusi/konsensus?isu=${issue.slug}`} variant="outline" className="px-5 py-3 text-base">
+              <Scale className="h-5 w-5" aria-hidden /> Setuju atau tidak?
             </ButtonLink>
-            <ButtonLink href="/voting/anggaran" variant="outline">
-              <Coins className="h-4 w-4" aria-hidden /> Anggaran Partisipatif
+            <ButtonLink href="/voting/anggaran" variant="outline" className="px-5 py-3 text-base">
+              <Coins className="h-5 w-5" aria-hidden /> Bagi uang kota
             </ButtonLink>
           </div>
         </Container>
       </header>
 
       <Container>
+        {/* Ringkas dulu: masalahnya apa, siapa yang kena */}
+        <Section title="Masalahnya">
+          <p className="max-w-3xl text-lg leading-relaxed text-slate-800">{issue.problem[0]}</p>
+        </Section>
+
+        <Section title="Siapa yang paling terdampak?" className="pt-0">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {issue.affected.map((a) => (
+              <IconRow key={a.group} icon={Users} title={a.group}>
+                {a.impact}
+              </IconRow>
+            ))}
+          </div>
+        </Section>
+
+        <Section>
+          <Subheading as="h2">
+            <span className="inline-flex items-center gap-2">
+              <MessagesSquare className="h-5 w-5 text-brand-600" aria-hidden /> Ide warga soal {issue.shortTitle.toLowerCase()}
+              <span className="font-normal text-slate-500">· {proposals.length} usulan</span>
+            </span>
+          </Subheading>
+          <div className="mt-5">
+            {top.length ? (
+              <div className="grid gap-4 md:grid-cols-2">
+                {top.map((p) => (
+                  <ProposalCard key={p.id} p={p} myVote={myVotes[p.id]} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState>Belum ada usulan. Jadilah yang pertama!</EmptyState>
+            )}
+            <div className="mt-4">
+              <ButtonLink href={`/usulan?isu=${issue.slug}`} variant="ghost">
+                Lihat semua usulan {issue.shortTitle.toLowerCase()} →
+              </ButtonLink>
+            </div>
+          </div>
+        </Section>
+        {/* Analisis lengkap untuk yang ingin mendalami (dan untuk juri) */}
+        <details className="group mt-4 rounded-lg border border-slate-200 bg-white">
+          <summary className="flex cursor-pointer list-none items-center gap-2 rounded-lg px-5 py-4 text-lg font-bold text-brand-800 hover:bg-brand-50 [&::-webkit-details-marker]:hidden">
+            <BookOpenText className="h-5 w-5 shrink-0" aria-hidden />
+            Lihat analisis lengkap: akar masalah, fakta & pilihan solusi
+            <ChevronDown className="ml-auto h-5 w-5 shrink-0 transition group-open:rotate-180" aria-hidden />
+          </summary>
+          <div className="border-t border-slate-200 px-5">
         {/* Slide strategi: Tujuan/Pertanyaan/Dampak │ Titik masalah │ Alternatif solusi */}
         <Section title="Analisis isu dalam satu halaman">
           <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr_1.3fr]">
@@ -125,16 +172,6 @@ export default async function IssueDetailPage({ params }: PageProps<"/isu/[slug]
           </div>
         </Section>
 
-        <Section title="Siapa yang paling terdampak?">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {issue.affected.map((a) => (
-              <IconRow key={a.group} icon={Users} title={a.group}>
-                {a.impact}
-              </IconRow>
-            ))}
-          </div>
-        </Section>
-
         {/* Matriks pertimbangan solusi (setara tabel 7Ps pada referensi) */}
         <Section title="Setiap solusi punya untung-rugi yang perlu ditimbang bersama">
           <div className="hidden grid-cols-[16rem_1fr_1fr] gap-3 pb-2 text-sm font-bold text-slate-500 md:grid">
@@ -171,31 +208,9 @@ export default async function IssueDetailPage({ params }: PageProps<"/isu/[slug]
           </ol>
         </Section>
 
-        <Section>
-          <Subheading as="h2">
-            <span className="inline-flex items-center gap-2">
-              <MessagesSquare className="h-5 w-5 text-brand-600" aria-hidden /> Usulan warga soal {issue.shortTitle.toLowerCase()}
-              <span className="font-normal text-slate-500">· {proposals.length} usulan, urut dukungan bersih</span>
-            </span>
-          </Subheading>
-          <div className="mt-5">
-            {top.length ? (
-              <div className="grid gap-4 md:grid-cols-2">
-                {top.map((p) => (
-                  <ProposalCard key={p.id} p={p} myVote={myVotes[p.id]} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState>Belum ada usulan. Jadilah yang pertama!</EmptyState>
-            )}
-            <div className="mt-4">
-              <ButtonLink href={`/usulan?isu=${issue.slug}`} variant="ghost">
-                Lihat semua usulan {issue.shortTitle.toLowerCase()} →
-              </ButtonLink>
-            </div>
+            <KeyTakeaway className="mb-10">{issue.takeaway}</KeyTakeaway>
           </div>
-          <KeyTakeaway className="mt-10">{issue.takeaway}</KeyTakeaway>
-        </Section>
+        </details>
       </Container>
     </>
   );

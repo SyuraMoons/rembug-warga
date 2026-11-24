@@ -5,7 +5,7 @@ import { IssueIcon, cn } from "./ui";
 export const SORTS = [
   { value: "terbaru", label: "Terbaru" },
   { value: "populer", label: "Dukungan terbanyak" },
-  { value: "diskusi", label: "Paling dirembugkan" },
+  { value: "diskusi", label: "Paling ramai dibahas" },
 ] as const;
 
 export type SortValue = (typeof SORTS)[number]["value"];
@@ -40,7 +40,7 @@ export function FilterBar({ basePath, issue, sort }: { basePath: string; issue?:
       </nav>
       <nav aria-label="Urutkan" className="flex flex-wrap gap-2">
         {SORTS.map((s) => (
-          <Link key={s.value} href={href(issue, s.value)} className={cn(chip(sort === s.value), "text-xs")} aria-current={sort === s.value ? "true" : undefined}>
+          <Link key={s.value} href={href(issue, s.value)} className={chip(sort === s.value)} aria-current={sort === s.value ? "true" : undefined}>
             {s.label}
           </Link>
         ))}
